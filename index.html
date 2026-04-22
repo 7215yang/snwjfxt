@@ -1,0 +1,3394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>少年沃积分管理</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 现代字体 Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #03050a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            transition: background 0.2s;
+        }
+
+        /* ===== 浅色主题 (需要SVIP) ===== */
+        body.light-mode {
+            background: #1a1e24;
+            --bg-deep: #222831;
+            --bg-elevated: #2d343d;
+            --bg-card: rgba(45, 52, 61, 0.7);
+            --bg-input: #3a424e;
+            --border-muted: #4b5563;
+            --border-glow: #6b7280;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e7eb;
+            --text-tertiary: #9ca3af;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --card-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+            --card-hover-shadow: 0 24px 40px -16px var(--accent), 0 0 0 1px var(--accent) inset;
+        }
+
+        body.light-mode .btn-primary,
+        body.light-mode .timer-btn,
+        body.light-mode .profile-btn,
+        body.light-mode .modal-close,
+        body.light-mode .svip-btn,
+        body.light-mode .add-student-section button,
+        body.light-mode .group-manager button,
+        body.light-mode .tool-btn:hover,
+        body.light-mode .batch-btn:hover,
+        body.light-mode .back-btn:hover,
+        body.light-mode .delete-class-detail:hover,
+        body.light-mode .student-card-btn:hover {
+            color: #ffffff !important;
+        }
+        body:not(.light-mode) .btn-primary,
+        body:not(.light-mode) .timer-btn,
+        body:not(.light-mode) .profile-btn,
+        body:not(.light-mode) .modal-close,
+        body:not(.light-mode) .svip-btn,
+        body:not(.light-mode) .add-student-section button,
+        body:not(.light-mode) .group-manager button {
+            color: black;
+        }
+
+        /* ===== 卡通主题 (SVIP专属) ===== */
+        body.cartoon-mode {
+            background: #f9e5d2;
+            --bg-deep: #ffefdb;
+            --bg-elevated: #fff5e6;
+            --bg-card: rgba(255, 226, 193, 0.7);
+            --bg-input: #ffdbb5;
+            --border-muted: #f5bc8f;
+            --border-glow: #f0a56e;
+            --text-primary: #5d3a1a;
+            --text-secondary: #7b4f2b;
+            --text-tertiary: #9b6e45;
+            --accent: #f97316;
+            --accent-glow: rgba(249, 115, 22, 0.3);
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --card-shadow: 0 20px 30px -12px rgba(0,0,0,0.15), 0 0 0 1px #ffcba1 inset;
+            --card-hover-shadow: 0 24px 40px -16px #f97316, 0 0 0 1px var(--accent) inset;
+        }
+        body.cartoon-mode .btn-primary,
+        body.cartoon-mode .timer-btn,
+        body.cartoon-mode .profile-btn,
+        body.cartoon-mode .modal-close,
+        body.cartoon-mode .svip-btn,
+        body.cartoon-mode .add-student-section button,
+        body.cartoon-mode .group-manager button {
+            color: black;
+        }
+
+        :root {
+            --bg-deep: #03050a;
+            --bg-elevated: #0b0f16;
+            --bg-card: rgba(19, 26, 36, 0.7);
+            --bg-input: #1e2632;
+            --border-muted: #25303e;
+            --border-glow: #2f3f54;
+            --text-primary: #f0f6ff;
+            --text-secondary: #b8c9e6;
+            --text-tertiary: #7f95b5;
+            --accent: #3b82f6;
+            --accent-hover: #5f9cf0;
+            --accent-glow: rgba(59, 130, 246, 0.3);
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --card-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+            --card-hover-shadow: 0 24px 40px -16px rgba(59, 130, 246, 0.3), 0 0 0 1px var(--accent) inset;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* 全局错误蓝屏样式（文字居左） */
+        .fatal-error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a2f6c;
+            background: linear-gradient(145deg, #1e3a8a, #0c1b3a);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            padding-left: 10%;
+            padding-right: 10%;
+            text-align: left;
+            font-family: monospace;
+            color: white;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fatal-error-overlay h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-shadow: 4px 4px 0 #0a1a3a;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+        .fatal-error-overlay .error-sub {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: rgba(0,0,0,0.4);
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            display: inline-block;
+            text-align: left;
+        }
+        .fatal-error-overlay .error-code {
+            font-size: 1.1rem;
+            background: #0a1f4a;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            margin: 1rem 0;
+            font-weight: bold;
+            border: 1px solid #88aaff;
+            display: inline-block;
+            text-align: left;
+        }
+        .fatal-error-overlay .wechat-info {
+            margin-top: 2rem;
+            font-size: 1rem;
+            background: rgba(0,0,0,0.5);
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            backdrop-filter: blur(8px);
+            display: inline-block;
+            text-align: left;
+        }
+        .fatal-error-overlay .reload-btn {
+            margin-top: 2rem;
+            background: white;
+            color: #1e3a8a;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-block;
+            text-align: left;
+        }
+        .fatal-error-overlay .reload-btn:hover {
+            transform: scale(1.02);
+            background: #e0f0ff;
+        }
+
+        /* 修复所有主题下的文字颜色一致性 */
+        .logo h1,
+        .class-title,
+        .class-info,
+        .student-name,
+        .profile-field input,
+        .profile-field select,
+        .input-field,
+        .user-greeting,
+        .btn-icon,
+        .tool-btn,
+        .batch-btn,
+        .back-btn,
+        .delete-class-detail,
+        .class-tab,
+        .group-manager input,
+        .add-student-section input,
+        .add-student-section select,
+        .modal-content,
+        .profile-card,
+        .auth-card,
+        .feature-card h4,
+        .timer-display,
+        .student-points {
+            color: var(--text-primary);
+        }
+
+        .class-stats,
+        .footer-note,
+        .checkbox-row,
+        .forgot-password-link,
+        .auth-tab:not(.active),
+        .tool-section label,
+        .student-actions-card .student-card-btn {
+            color: var(--text-secondary);
+        }
+
+        .profile-field label,
+        .empty-grid,
+        .svip-section span:not(.svip-badge) {
+            color: var(--text-tertiary);
+        }
+
+        .rank-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--accent);
+            color: black;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #ff6ec4, #7873f5, #3b82f6, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            text-shadow: 0 0 8px rgba(59,130,246,0.3);
+        }
+
+        .logo .version,
+        .logo .vip-version {
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(255, 255, 255, 0.02);
+            background-image: linear-gradient(145deg, #ffb86b, #ff6bcb, #6bc5ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .logo .version:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+            text-shadow: 0 0 6px rgba(255,255,200,0.5);
+        }
+
+        #app {
+            width: 100%;
+            max-width: 1440px;
+            min-height: 90vh;
+            background: var(--bg-deep);
+            border-radius: 2.5rem;
+            box-shadow: 0 30px 60px -20px black, 0 0 0 1px #1f2937;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(2px);
+            position: relative;
+            animation: appEnter 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        @keyframes appEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.98) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        #app::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        #app::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            right: -10%;
+            width: 50%;
+            height: 50%;
+            background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-header, .main-container, .detail-container, .auth-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 主内容区域入场动画（每次切换视图时触发） */
+        .main-container, .detail-container, .auth-container {
+            animation: contentFadeUp 0.4s ease-out;
+        }
+        @keyframes contentFadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .app-header {
+            padding: 1.5rem 2.8rem;
+            background: rgba(10, 15, 25, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            box-shadow: 0 10px 25px -10px black;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-greeting {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(8px);
+            padding: 0.6rem 1.5rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255,255,255,0.03);
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .user-greeting:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 18px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 0.6rem 1.5rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .btn-icon:hover {
+            background: rgba(59,130,246,0.1);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--accent-glow);
+        }
+        .btn-icon:active {
+            transform: scale(0.96);
+            transition: transform 0.05s;
+        }
+
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: modalOverlayFade 0.2s ease-out;
+        }
+        @keyframes modalOverlayFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 50px black;
+            animation: modalZoomIn 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+            backdrop-filter: blur(16px);
+        }
+        @keyframes modalZoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.92);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .modal-content h2 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .modal-close {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.6rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            float: right;
+            color: black;
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+        }
+        .modal-close:active {
+            transform: scale(0.97);
+        }
+        .account-list {
+            list-style: none;
+            margin: 1.5rem 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .account-item {
+            padding: 0.8rem 1.2rem;
+            background: var(--bg-input);
+            border-radius: 60px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .account-item:hover {
+            background: var(--accent);
+            color: black;
+            transform: translateX(5px);
+        }
+
+        /* 个人主页 */
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            animation: fadeScaleIn 0.3s ease;
+            backdrop-filter: blur(12px);
+        }
+        @keyframes fadeScaleIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--accent), #2563eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 1.5rem;
+            transition: transform 0.2s;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.02);
+        }
+        .profile-field {
+            margin-bottom: 1.2rem;
+        }
+        .profile-field label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+        }
+        .profile-field input, .profile-field select {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-muted);
+            border-radius: 60px;
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .profile-field input:focus, .profile-field select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+            outline: none;
+        }
+        .svip-section {
+            background: rgba(255,255,255,0.02);
+            border-radius: 60px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .svip-badge {
+            background: gold;
+            color: black;
+            padding: 0.2rem 1rem;
+            border-radius: 60px;
+            font-weight: 600;
+        }
+        .svip-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: black;
+            transition: all 0.2s;
+        }
+        .svip-btn:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+        }
+        .profile-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        .profile-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.7rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: black;
+            transition: all 0.2s;
+        }
+        .profile-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+        .profile-btn:active {
+            transform: scale(0.97);
+        }
+        .profile-btn.secondary {
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* SVIP专属功能区 */
+        .svip-features {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(59,130,246,0.1);
+            border-radius: 2rem;
+            border: 1px solid var(--accent);
+            backdrop-filter: blur(8px);
+        }
+        .svip-features h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            text-align: center;
+            border: 1px solid var(--border-glow);
+            transition: all 0.25s;
+            backdrop-filter: blur(8px);
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 20px -8px var(--accent-glow);
+        }
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            font-family: monospace;
+            margin: 1rem 0;
+        }
+        .timer-controls, .stopwatch-controls {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .timer-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.5rem 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: black;
+            transition: var(--transition);
+        }
+        .timer-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .timer-btn:active {
+            transform: scale(0.96);
+        }
+        .timer-btn.secondary {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* 登录/注册卡片 */
+        .auth-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        .auth-card {
+            background: var(--bg-card);
+            width: 100%;
+            max-width: 460px;
+            border-radius: 2.5rem;
+            padding: 2.8rem 2.5rem;
+            border: 1px solid var(--border-glow);
+            box-shadow: var(--card-shadow);
+            animation: cardGlow 0.5s ease-out;
+            backdrop-filter: blur(16px);
+        }
+        @keyframes cardGlow {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-muted);
+            padding-bottom: 1.2rem;
+        }
+        .auth-tab {
+            flex: 1;
+            background: transparent;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 0.7rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .auth-tab.active {
+            background: rgba(59,130,246,0.15);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .input-field {
+            background: var(--bg-input);
+            border: 1px solid var(--border-muted);
+            border-radius: 60px;
+            padding: 1rem 1.8rem;
+            font-size: 1rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .input-field:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+            transition: transform 0.1s;
+        }
+        .checkbox-row input:active {
+            transform: scale(0.9);
+        }
+        .captcha-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: var(--bg-input);
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid var(--border-muted);
+        }
+        .captcha-row span {
+            font-weight: 600;
+        }
+        .captcha-input {
+            width: 90px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-muted);
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            text-align: center;
+        }
+        .captcha-refresh {
+            background: transparent;
+            border: 1px solid var(--border-muted);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .captcha-refresh:hover {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+            transform: rotate(15deg);
+        }
+        .btn-primary {
+            background: linear-gradient(145deg, var(--accent), #2563eb);
+            border: none;
+            border-radius: 60px;
+            padding: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 18px rgba(37,99,235,0.3);
+            color: black;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 24px var(--accent-glow);
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .forgot-password-link {
+            text-align: right;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-decoration: underline;
+            margin-top: -0.5rem;
+            transition: color 0.2s;
+        }
+        .forgot-password-link:hover {
+            color: var(--accent-hover);
+        }
+
+        /* 主界面 */
+        .main-container, .detail-container {
+            flex: 1;
+            padding: 2rem 2.5rem;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(15,23,35,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            padding: 1.2rem 2.2rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2.8rem;
+            animation: slideDownFade 0.35s ease;
+        }
+        @keyframes slideDownFade {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tool-section {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(0,0,0,0.3);
+            padding: 0.3rem 1rem 0.3rem 1.5rem;
+            border-radius: 60px;
+            border: 1px solid rgba(255,255,255,0.02);
+        }
+        .tool-btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 60px;
+            padding: 0.6rem 1.4rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .tool-btn:hover {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+        .tool-btn:active {
+            transform: translateY(1px);
+        }
+
+        .class-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .class-card {
+            background: rgba(20,30,42,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            padding: 2rem;
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: var(--card-shadow);
+            animation: none;
+        }
+        .class-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-6px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        .class-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .class-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .class-title i {
+            color: var(--accent);
+            filter: drop-shadow(0 0 5px var(--accent));
+        }
+        .class-stats {
+            font-size: 1rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+        .delete-class-btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .delete-class-btn:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+            transform: scale(1.05);
+        }
+
+        /* 班级详情 */
+        .detail-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .back-btn {
+            background: rgba(255,255,255,0.02);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 0.7rem 1.6rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .back-btn:hover {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+            transform: translateX(-4px);
+        }
+        .class-info {
+            font-size: 2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .delete-class-detail {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 0.7rem 1.6rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .delete-class-detail:hover {
+            background: var(--danger);
+            color: white;
+            transform: scale(1.02);
+        }
+
+        .class-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0 1.5rem;
+        }
+        .class-tab {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            padding: 0.7rem 2rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .class-tab.active {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+        }
+        .class-tab:hover:not(.active) {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-2px);
+        }
+
+        .batch-bar {
+            background: rgba(15,23,35,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.2rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            box-shadow: var(--card-shadow);
+            animation: slideDownFade 0.35s ease;
+        }
+        .batch-btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            border-radius: 60px;
+            padding: 0.7rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .batch-btn:hover {
+            background: var(--accent);
+            color: black;
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .group-manager {
+            background: rgba(15,23,35,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            box-shadow: var(--card-shadow);
+            animation: slideDownFade 0.35s ease;
+        }
+        .group-manager input {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-muted);
+            border-radius: 60px;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.2s;
+        }
+        .group-manager input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .group-manager button {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: black;
+            transition: all 0.2s;
+        }
+        .group-manager button:hover {
+            transform: scale(1.02);
+            filter: brightness(1.05);
+        }
+
+        .add-student-section {
+            background: rgba(15,23,35,0.5);
+            backdrop-filter: blur(12px);
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(255,255,255,0.02);
+            box-shadow: var(--card-shadow);
+            animation: slideDownFade 0.35s ease;
+        }
+        .add-student-section input, .add-student-section select {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-muted);
+            border-radius: 60px;
+            padding: 0.8rem 1.5rem;
+            transition: all 0.2s;
+        }
+        .add-student-section input:focus, .add-student-section select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-glow);
+        }
+        .add-student-section button {
+            background: linear-gradient(145deg, var(--accent), #2563eb);
+            border: none;
+            border-radius: 60px;
+            padding: 0.8rem 2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: black;
+        }
+        .add-student-section button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 18px var(--accent-glow);
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1.8rem;
+        }
+        .student-card {
+            background: rgba(20,30,42,0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.02);
+            border-radius: 2rem;
+            padding: 1.8rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            aspect-ratio: 1 / 1;
+            transition: var(--transition);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            animation: none;
+        }
+        .student-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--card-hover-shadow);
+        }
+        .student-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            width: 100%;
+        }
+        .student-name i {
+            color: var(--accent);
+            font-size: 2.2rem;
+        }
+        .student-points {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 8px 0;
+            transition: none;
+        }
+        .student-points.positive {
+            color: var(--success);
+        }
+        .student-points.negative {
+            color: var(--danger);
+            text-shadow: 0 0 10px rgba(239,68,68,0.5);
+        }
+        .student-actions-card {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .student-card-btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.03);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        .student-card-btn:hover {
+            background: var(--accent);
+            color: black;
+            transform: translateY(-2px);
+        }
+        .student-card-btn:active {
+            transform: scale(0.92);
+        }
+        .student-card-btn.del:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .empty-grid {
+            grid-column: 1 / -1;
+            background: rgba(20,30,42,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 2.5rem;
+            padding: 3rem;
+            text-align: center;
+            border: 1px dashed var(--border-muted);
+            font-size: 1.1rem;
+        }
+
+        .footer-note {
+            text-align: right;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.02);
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        #import-file {
+            display: none;
+        }
+
+        /* SVIP徽章在用户名右侧 */
+        .svip-badge-user {
+            background: linear-gradient(145deg, #ffd966, #ffb347);
+            color: #3c2a1f;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+
+        /* 开发者模式按钮 */
+        .dev-crash-btn, .dev-close-btn {
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 60px;
+            padding: 0.6rem 1.2rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .dev-close-btn {
+            background: #555;
+            margin-left: 0.5rem;
+        }
+        .dev-crash-btn:active, .dev-close-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* 右下角系统未激活水印 - 已放大字样 */
+        .inactive-watermark {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(12px);
+            color: #ffaa66;
+            font-size: 1.3rem;
+            font-weight: 800;
+            padding: 10px 20px;
+            border-radius: 60px;
+            letter-spacing: 1px;
+            z-index: 9999;
+            pointer-events: none;
+            font-family: monospace;
+            border: 1px solid rgba(255,180,100,0.6);
+            box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+            animation: watermarkPulse 2s infinite;
+            white-space: nowrap;
+        }
+        @keyframes watermarkPulse {
+            0% { opacity: 0.7; transform: scale(1);}
+            50% { opacity: 1; transform: scale(1.03);}
+            100% { opacity: 0.7; transform: scale(1);}
+        }
+
+        /* ========== 启动加载页面样式 ========== */
+        .startup-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #03050a;
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px);
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .startup-loader.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .shenlin-os-logo {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .shenlin-os-logo .main-title {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6ec4, #f9a825, #3b82f6, #10b981);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
+            text-shadow: 0 0 20px rgba(59,130,246,0.5);
+            margin-bottom: 0.5rem;
+            animation: titleGlow 1.2s ease-in-out infinite alternate;
+        }
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 5px rgba(59,130,246,0.3); }
+            100% { text-shadow: 0 0 25px rgba(59,130,246,0.8); }
+        }
+        .shenlin-os-logo .sub {
+            font-size: 1.2rem;
+            color: #b8c9e6;
+            letter-spacing: 2px;
+        }
+        .powered {
+            margin-top: 2rem;
+            font-size: 1rem;
+            color: #7f95b5;
+        }
+        .powered strong {
+            background: linear-gradient(135deg, #ff6ec4, #f9a825, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+        .loader-spinner {
+            margin-top: 2.5rem;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(59,130,246,0.2);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 全屏时钟样式 - 12小时制，大字体 */
+        .fullscreen-clock {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.94);
+            backdrop-filter: blur(20px);
+            z-index: 20001;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: fadeIn 0.3s ease;
+        }
+        .clock-time {
+            font-size: 12rem;
+            font-weight: 800;
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #fff, #a0c0ff, #6ee7b7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 30px rgba(59,130,246,0.5);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .clock-time .ampm {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ffaa66, #ff6ec4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .clock-date {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+        .clock-close-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.4);
+            padding: 0.5rem;
+            width: fit-content;
+            margin: 0 auto;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 768px) {
+            .clock-time { font-size: 5rem; }
+            .clock-time .ampm { font-size: 1.8rem; }
+            .clock-date { font-size: 1.2rem; }
+            .inactive-watermark { font-size: 1rem; padding: 6px 14px; white-space: nowrap; }
+        }
+        
+        /* 更多功能下拉菜单样式 */
+        .more-menu {
+            position: fixed;
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            border-radius: 1.5rem;
+            padding: 0.5rem 0;
+            min-width: 160px;
+            z-index: 2100;
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.5);
+            animation: menuFadeIn 0.15s ease-out;
+        }
+        @keyframes menuFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .more-menu-item {
+            padding: 0.7rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background 0.15s;
+            color: var(--text-primary);
+        }
+        .more-menu-item i {
+            width: 22px;
+            color: var(--accent);
+        }
+        .more-menu-item:hover {
+            background: var(--accent);
+            color: black;
+        }
+        .more-menu-item:hover i {
+            color: black;
+        }
+
+        /* 撤回按钮样式 */
+        .undo-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1) inset;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 1000;
+        }
+        .undo-fab:hover {
+            transform: scale(1.05);
+            background: #2563eb;
+        }
+        .undo-fab:active {
+            transform: scale(0.96);
+        }
+        body.light-mode .undo-fab, body.cartoon-mode .undo-fab {
+            color: black;
+        }
+
+        /* 启动台白色条和面板 */
+        .app-drawer-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 5px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            z-index: 1100;
+            backdrop-filter: blur(4px);
+        }
+        .app-drawer-trigger:hover {
+            background: rgba(255,255,255,0.8);
+        }
+        .app-drawer-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem 2rem 0 0;
+            border-top: 1px solid var(--border-glow);
+            padding: 1.5rem 1rem 2rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1200;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+        }
+        .app-drawer-panel.open {
+            transform: translateY(0);
+        }
+        .app-drawer-header {
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-muted);
+        }
+        .app-drawer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 1rem;
+            justify-items: center;
+        }
+        .app-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 1rem;
+            transition: background 0.2s;
+            width: 80px;
+        }
+        .app-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .app-icon-circle {
+            width: 56px;
+            height: 56px;
+            background: var(--accent);
+            border-radius: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .app-icon-name {
+            font-size: 0.7rem;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* 进度条模态框样式 */
+        .progress-modal {
+            text-align: center;
+        }
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent);
+            border-radius: 4px;
+            transition: width 0.05s linear;
+        }
+    </style>
+</head>
+<body>
+    <!-- 启动加载页面 -->
+    <div class="startup-loader" id="startupLoader">
+        <div class="shenlin-os-logo">
+            <div class="main-title">shenlinOS</div>
+            <div class="sub">NEXT-2.1</div>
+        </div>
+        <div class="powered">
+            Powered by <strong>Open shenlinOS</strong>
+        </div>
+        <div class="loader-spinner"></div>
+    </div>
+
+    <div id="app"></div>
+
+    <script>
+        (function() {
+            // 存储key
+            const STORAGE_USERS = 'points_users';
+            const STORAGE_REMEMBER = 'remember_credentials';
+            const STORAGE_KEEP_LOGIN = 'keep_login';
+            const STORAGE_THEME = 'user_theme';
+            const STORAGE_DEV_MODE = 'dev_mode_active';
+            // 新版本号常量 - 升级为2.1
+            const VERSION_STRING = 'shenlinOS NEXT-2.1';
+
+            const genId = () => 'id_' + Date.now() + Math.random().toString(36).substr(2, 6);
+            const encodePass = (pwd) => btoa(pwd);
+            const decodePass = (encoded) => atob(encoded);
+
+            const defaultProfile = {
+                avatar: '',
+                gender: '保密',
+                vipExpire: 0,
+                systemActivatedUntil: 0
+            };
+
+            // ---------- 全局错误蓝屏系统 ----------
+            let isErrorOverlayActive = false;
+            function showFatalError(errorCode, details = '') {
+                if (isErrorOverlayActive) return;
+                isErrorOverlayActive = true;
+                const existing = document.querySelector('.fatal-error-overlay');
+                if (existing) existing.remove();
+                const overlay = document.createElement('div');
+                overlay.className = 'fatal-error-overlay';
+                overlay.innerHTML = `
+                    <h1>:(</h1>
+                    <div class="error-sub">系统遇到问题</div>
+                    <div class="error-code">错误代码：${escapeHtml(errorCode)}</div>
+                    <div style="max-width: 80%; margin: 0.5rem 0; font-size: 1rem;">${escapeHtml(details)}</div>
+                    <div class="wechat-info">
+                        <i class="fa-brands fa-weixin"></i> 请截图并向微信公众号 <strong style="color:#ffdd88;">Dear7215</strong> 反馈问题
+                    </div>
+                    <button class="reload-btn" id="fatal-reload-btn"><i class="fa-solid fa-rotate-right"></i> 重新加载页面</button>
+                `;
+                document.body.appendChild(overlay);
+                document.getElementById('fatal-reload-btn')?.addEventListener('click', () => window.location.reload());
+                console.error(`[致命错误] ${errorCode} : ${details}`);
+            }
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
+            }
+
+            // 心跳检测
+            let lastHeartbeat = Date.now();
+            let heartbeatCheckInterval = null;
+            let heartbeatRAF = null;
+            function startHeartbeatDetection() {
+                if (heartbeatCheckInterval) clearInterval(heartbeatCheckInterval);
+                if (heartbeatRAF) cancelAnimationFrame(heartbeatRAF);
+                lastHeartbeat = Date.now();
+                function beat() { lastHeartbeat = Date.now(); if (!isErrorOverlayActive) heartbeatRAF = requestAnimationFrame(beat); }
+                heartbeatRAF = requestAnimationFrame(beat);
+                heartbeatCheckInterval = setInterval(() => {
+                    if (isErrorOverlayActive) return;
+                    if (Date.now() - lastHeartbeat > 5500) {
+                        showFatalError('THREAD_BLOCKED_0xDEAD', '页面主线程长时间未响应，可能发生卡死或无限循环。');
+                    }
+                }, 5000);
+            }
+
+            // 全局错误捕获
+            window.addEventListener('error', (event) => {
+                if (isErrorOverlayActive) return;
+                const errMsg = event.message || event.error?.message || '未知脚本错误';
+                const errStack = event.error?.stack || '';
+                showFatalError('RUNTIME_ERROR', `${errMsg}\n${errStack.slice(0, 200)}`);
+            });
+            window.addEventListener('unhandledrejection', (event) => {
+                if (isErrorOverlayActive) return;
+                const reason = event.reason?.message || event.reason || 'Promise未捕获异常';
+                showFatalError('PROMISE_REJECTION', String(reason).slice(0, 300));
+            });
+
+            // ---------- 开发者模式 ----------
+            let devModeEnabled = (() => {
+                try { return localStorage.getItem(STORAGE_DEV_MODE) === 'true'; } catch(e) { return false; }
+            })();
+            function saveDevModeState(state) { 
+                devModeEnabled = state; 
+                localStorage.setItem(STORAGE_DEV_MODE, state ? 'true' : 'false');
+            }
+            function triggerCrashForDev() {
+                if (!devModeEnabled) { alert('未开启开发者模式'); return; }
+                showFatalError('DEV_MANUAL_CRASH', '用户通过开发者模式【卡死按钮】触发系统模拟崩溃，页面将进入无响应状态。');
+                setTimeout(() => { while (true) {} }, 50);
+            }
+
+            // ---------- 全屏时钟功能（12小时制，大字体）----------
+            let clockInterval = null;
+            function showFullscreenClock() {
+                const existingClock = document.querySelector('.fullscreen-clock');
+                if (existingClock) existingClock.remove();
+                if (clockInterval) clearInterval(clockInterval);
+                
+                const clockDiv = document.createElement('div');
+                clockDiv.className = 'fullscreen-clock';
+                const timeSpan = document.createElement('div');
+                timeSpan.className = 'clock-time';
+                const dateSpan = document.createElement('div');
+                dateSpan.className = 'clock-date';
+                const hintSpan = document.createElement('div');
+                hintSpan.className = 'clock-close-hint';
+                hintSpan.innerHTML = '<i class="fa-regular fa-circle-xmark"></i> 点击任意位置关闭';
+                clockDiv.appendChild(timeSpan);
+                clockDiv.appendChild(dateSpan);
+                clockDiv.appendChild(hintSpan);
+                document.body.appendChild(clockDiv);
+                
+                function updateClock() {
+                    const now = new Date();
+                    let hours = now.getHours();
+                    const minutes = now.getMinutes().toString().padStart(2, '0');
+                    const seconds = now.getSeconds().toString().padStart(2, '0');
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    let hour12 = hours % 12;
+                    if (hour12 === 0) hour12 = 12;
+                    const hourStr = hour12.toString().padStart(2, '0');
+                    timeSpan.innerHTML = `${hourStr}:${minutes}:${seconds} <span class="ampm">${ampm}</span>`;
+                    const year = now.getFullYear();
+                    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                    const day = now.getDate().toString().padStart(2, '0');
+                    const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+                    const weekday = weekdays[now.getDay()];
+                    dateSpan.textContent = `${year}.${month}.${day} ${weekday}`;
+                }
+                updateClock();
+                clockInterval = setInterval(updateClock, 1000);
+                
+                const closeClock = () => {
+                    if (clockInterval) clearInterval(clockInterval);
+                    clockInterval = null;
+                    if (clockDiv && clockDiv.parentNode) clockDiv.parentNode.removeChild(clockDiv);
+                };
+                clockDiv.addEventListener('click', closeClock);
+                clockDiv.addEventListener('touchstart', closeClock);
+            }
+
+            // ===================== 撤销/历史记录系统 =====================
+            let historyStack = [];
+            let historyIndex = -1;
+            const MAX_HISTORY = 50;
+
+            function deepCopyUserData() {
+                return JSON.parse(JSON.stringify(userData));
+            }
+
+            function pushHistory() {
+                if (historyIndex < historyStack.length - 1) {
+                    historyStack = historyStack.slice(0, historyIndex + 1);
+                }
+                const snapshot = deepCopyUserData();
+                historyStack.push(snapshot);
+                if (historyStack.length > MAX_HISTORY) {
+                    historyStack.shift();
+                } else {
+                    historyIndex = historyStack.length - 1;
+                }
+            }
+
+            function undo() {
+                if (historyIndex <= 0) {
+                    alert('没有可以撤销的操作了');
+                    return;
+                }
+                historyIndex--;
+                const previousState = historyStack[historyIndex];
+                Object.assign(userData, previousState);
+                saveUserData(currentUser, userData);
+                renderMain();
+            }
+
+            function resetHistoryAndPush() {
+                historyStack = [];
+                historyIndex = -1;
+                pushHistory();
+            }
+
+            // ---------- 系统激活判断 ----------
+            function isSystemActivated() {
+                return currentUser && (userData.profile?.systemActivatedUntil || 0) > Date.now();
+            }
+
+            // ---------- 权重随机点名工具函数 ----------
+            function getWeightedRandomStudent(classId) {
+                const students = userData.students.filter(s => s.classId === classId);
+                if (students.length === 0) return null;
+                let totalWeight = 0;
+                const weights = [];
+                students.forEach(stu => {
+                    const w = (userData.randomProbWeights && userData.randomProbWeights[`${classId}_${stu.id}`] !== undefined) ? userData.randomProbWeights[`${classId}_${stu.id}`] : 1;
+                    totalWeight += w;
+                    weights.push({ student: stu, weight: w });
+                });
+                if (totalWeight === 0) return null;
+                let random = Math.random() * totalWeight;
+                for (let item of weights) {
+                    if (random < item.weight) return item.student;
+                    random -= item.weight;
+                }
+                return null;
+            }
+
+            // ---------- 进度条辅助函数 ----------
+            function showProgressModal(actionName, onComplete) {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content progress-modal" style="max-width: 300px;">
+                        <h2><i class="fa-solid fa-spinner fa-pulse"></i> ${actionName}中</h2>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progress-fill"></div>
+                        </div>
+                        <p id="progress-text">0%</p>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                const fill = modal.querySelector('#progress-fill');
+                const text = modal.querySelector('#progress-text');
+                let percent = 0;
+                const interval = setInterval(() => {
+                    percent += 4;
+                    if (percent >= 100) {
+                        percent = 100;
+                        clearInterval(interval);
+                        fill.style.width = '100%';
+                        text.innerText = '100%';
+                        setTimeout(() => {
+                            modal.remove();
+                            if (onComplete) onComplete();
+                        }, 200);
+                    } else {
+                        fill.style.width = percent + '%';
+                        text.innerText = percent + '%';
+                    }
+                }, 20);
+            }
+
+            // ---------- App Store 相关 ----------
+            const AVAILABLE_APPS = [
+                { id: 'random_probability', name: '随机点名概率调整', icon: 'fa-dice-d6', description: '自定义每个学生被点名的权重，实现概率调整' }
+            ];
+            function getInstalledApps() {
+                if (!userData.installedApps) userData.installedApps = [];
+                return userData.installedApps;
+            }
+            function isAppInstalled(appId) {
+                return getInstalledApps().includes(appId);
+            }
+            function refreshAppDrawer() {
+                if (currentUser && isSystemActivated()) {
+                    removeAppDrawer();
+                    createAppDrawer();
+                } else {
+                    removeAppDrawer();
+                }
+            }
+            // 异步安装，带进度条
+            async function installApp(appId) {
+                if (!isSystemActivated()) { alert('系统未激活，无法安装应用。请先激活系统（设置中使用激活码或试用）。'); return false; }
+                if (isAppInstalled(appId)) return false;
+                return new Promise((resolve) => {
+                    showProgressModal('安装', () => {
+                        userData.installedApps.push(appId);
+                        saveUserData(currentUser, userData);
+                        refreshAppDrawer();
+                        resolve(true);
+                    });
+                });
+            }
+            // 异步卸载，带进度条
+            async function uninstallApp(appId) {
+                if (!isSystemActivated()) { alert('系统未激活，无法卸载应用。'); return false; }
+                const idx = userData.installedApps.indexOf(appId);
+                if (idx === -1) return false;
+                return new Promise((resolve) => {
+                    showProgressModal('卸载', () => {
+                        userData.installedApps.splice(idx, 1);
+                        saveUserData(currentUser, userData);
+                        refreshAppDrawer();
+                        resolve(true);
+                    });
+                });
+            }
+
+            // 随机点名概率调整应用界面
+            function showRandomProbabilityApp() {
+                if (!isSystemActivated()) { alert('系统未激活，无法使用此应用。请先激活系统。'); return; }
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                        <h2><i class="fa-solid fa-dice-d6"></i> 随机点名概率调整</h2>
+                        <div style="margin: 1rem 0;">
+                            <label>选择班级：</label>
+                            <select id="prob-class-select" class="input-field" style="margin-top: 0.5rem;"></select>
+                        </div>
+                        <div id="prob-student-list" style="margin: 1rem 0; max-height: 300px; overflow-y: auto;">
+                            <div class="empty-grid">请先选择班级</div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                            <button id="prob-random-btn" class="profile-btn"><i class="fa-solid fa-shuffle"></i> 按权重点名</button>
+                            <button id="prob-reset-all-btn" class="profile-btn secondary">重置所有权重为1</button>
+                        </div>
+                        <div id="prob-result" style="margin-top: 1rem; text-align: center; font-size: 1.2rem; min-height: 3rem;"></div>
+                        <button class="modal-close" id="prob-close">关闭</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                if (!userData.randomProbWeights) userData.randomProbWeights = {};
+
+                const classSelect = document.getElementById('prob-class-select');
+                const studentContainer = document.getElementById('prob-student-list');
+                const randomBtn = document.getElementById('prob-random-btn');
+                const resetAllBtn = document.getElementById('prob-reset-all-btn');
+                const resultDiv = document.getElementById('prob-result');
+
+                function loadClasses() {
+                    classSelect.innerHTML = '<option value="">-- 请选择班级 --</option>';
+                    userData.classes.forEach(cls => {
+                        const option = document.createElement('option');
+                        option.value = cls.id;
+                        option.textContent = cls.name;
+                        classSelect.appendChild(option);
+                    });
+                }
+                function loadStudents(classId) {
+                    const students = userData.students.filter(s => s.classId === classId);
+                    if (students.length === 0) {
+                        studentContainer.innerHTML = '<div class="empty-grid">该班级暂无学生</div>';
+                        return;
+                    }
+                    let html = '<div style="display: flex; flex-direction: column; gap: 0.5rem;">';
+                    students.forEach(stu => {
+                        const weight = (userData.randomProbWeights[`${classId}_${stu.id}`] !== undefined) ? userData.randomProbWeights[`${classId}_${stu.id}`] : 1;
+                        html += `
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-input); border-radius: 60px; padding: 0.5rem 1rem;">
+                                <span><strong>${stu.name}</strong> (积分: ${stu.points})</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <span>权重:</span>
+                                    <input type="number" min="0" step="1" value="${weight}" class="prob-weight-input" data-class="${classId}" data-student="${stu.id}" style="width: 70px; background: var(--bg-input); border-radius: 60px; padding: 0.3rem 0.5rem; text-align: center;">
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    studentContainer.innerHTML = html;
+                    document.querySelectorAll('.prob-weight-input').forEach(inp => {
+                        inp.addEventListener('change', (e) => {
+                            const classId = inp.dataset.class;
+                            const studentId = inp.dataset.student;
+                            let newWeight = parseInt(inp.value);
+                            if (isNaN(newWeight) || newWeight < 0) newWeight = 0;
+                            userData.randomProbWeights[`${classId}_${studentId}`] = newWeight;
+                            saveUserData(currentUser, userData);
+                        });
+                    });
+                }
+
+                classSelect.addEventListener('change', (e) => {
+                    const classId = e.target.value;
+                    if (classId) loadStudents(classId);
+                    else studentContainer.innerHTML = '<div class="empty-grid">请先选择班级</div>';
+                });
+
+                randomBtn.addEventListener('click', () => {
+                    const classId = classSelect.value;
+                    if (!classId) { resultDiv.innerHTML = '<span style="color: var(--danger);">请先选择班级</span>'; return; }
+                    const selected = getWeightedRandomStudent(classId);
+                    if (!selected) {
+                        resultDiv.innerHTML = '<span style="color: var(--danger);">无法点名（总权重为0或无学生）</span>';
+                        return;
+                    }
+                    const group = userData.groups.find(g => g.id === selected.groupId);
+                    const groupStr = group ? ` (${group.name})` : '';
+                    resultDiv.innerHTML = `<span style="color: var(--success); font-size: 1.5rem;">🎉 点名结果：${selected.name}${groupStr}</span>`;
+                });
+
+                resetAllBtn.addEventListener('click', () => {
+                    const classId = classSelect.value;
+                    if (!classId) { resultDiv.innerHTML = '<span style="color: var(--danger);">请先选择班级</span>'; return; }
+                    const students = userData.students.filter(s => s.classId === classId);
+                    students.forEach(stu => {
+                        delete userData.randomProbWeights[`${classId}_${stu.id}`];
+                    });
+                    saveUserData(currentUser, userData);
+                    if (classId) loadStudents(classId);
+                    resultDiv.innerHTML = '<span style="color: var(--success);">所有权重已重置为1</span>';
+                });
+
+                loadClasses();
+                document.getElementById('prob-close').addEventListener('click', () => document.body.removeChild(modal));
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+
+            // App Store 模态框 (异步安装/卸载)
+            async function showAppStoreModal() {
+                if (!isSystemActivated()) { alert('系统未激活，无法打开 App Store。请先激活系统。'); return; }
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                const installed = getInstalledApps();
+                let appsHtml = '';
+                AVAILABLE_APPS.forEach(app => {
+                    const isInstalled = installed.includes(app.id);
+                    appsHtml += `
+                        <div style="background: var(--bg-card); border-radius: 1.5rem; padding: 1rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 50px; height: 50px; background: var(--accent); border-radius: 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;"><i class="fa-solid ${app.icon}"></i></div>
+                            <div style="flex: 1;">
+                                <h4>${app.name}</h4>
+                                <p style="font-size: 0.8rem; color: var(--text-secondary);">${app.description}</p>
+                            </div>
+                            <button class="app-install-btn" data-app-id="${app.id}" style="background: ${isInstalled ? '#555' : 'var(--accent)'}; border: none; border-radius: 60px; padding: 0.5rem 1.2rem; cursor: pointer;">${isInstalled ? '卸载' : '安装'}</button>
+                        </div>
+                    `;
+                });
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 500px;">
+                        <h2><i class="fa-solid fa-store"></i> App Store</h2>
+                        <div id="appstore-list">${appsHtml}</div>
+                        <button class="modal-close" id="appstore-close">关闭</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                const installBtns = document.querySelectorAll('.app-install-btn');
+                for (let btn of installBtns) {
+                    btn.addEventListener('click', async (e) => {
+                        const appId = btn.dataset.appId;
+                        const isInstalled = getInstalledApps().includes(appId);
+                        if (isInstalled) {
+                            if (confirm(`确定要卸载“${AVAILABLE_APPS.find(a => a.id === appId).name}”吗？`)) {
+                                await uninstallApp(appId);
+                                modal.remove();
+                                showAppStoreModal(); // 刷新
+                            }
+                        } else {
+                            if (confirm(`确定安装“${AVAILABLE_APPS.find(a => a.id === appId).name}”吗？`)) {
+                                await installApp(appId);
+                                modal.remove();
+                                showAppStoreModal(); // 刷新
+                            }
+                        }
+                    });
+                }
+                document.getElementById('appstore-close').addEventListener('click', () => document.body.removeChild(modal));
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+
+            // 启动台相关
+            let drawerPanel = null;
+            let drawerTrigger = null;
+            function createAppDrawer() {
+                if (!isSystemActivated()) return;
+                if (drawerTrigger) drawerTrigger.remove();
+                if (drawerPanel) drawerPanel.remove();
+                drawerTrigger = document.createElement('div');
+                drawerTrigger.className = 'app-drawer-trigger';
+                drawerPanel = document.createElement('div');
+                drawerPanel.className = 'app-drawer-panel';
+                document.body.appendChild(drawerTrigger);
+                document.body.appendChild(drawerPanel);
+                let startY = 0;
+                drawerTrigger.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; });
+                drawerTrigger.addEventListener('touchmove', (e) => {
+                    const delta = e.touches[0].clientY - startY;
+                    if (delta < -30) {
+                        e.preventDefault();
+                        showAppDrawer();
+                    }
+                });
+                drawerTrigger.addEventListener('click', () => showAppDrawer());
+                function showAppDrawer() {
+                    const installedApps = getInstalledApps();
+                    if (installedApps.length === 0) {
+                        drawerPanel.innerHTML = `<div class="app-drawer-header"><i class="fa-regular fa-folder-open"></i> 启动台</div><div style="text-align: center; padding: 2rem;">暂无已安装应用，请前往 App Store 安装</div>`;
+                    } else {
+                        let gridHtml = '<div class="app-drawer-header"><i class="fa-regular fa-grid-2"></i> 应用启动台</div><div class="app-drawer-grid">';
+                        installedApps.forEach(appId => {
+                            const app = AVAILABLE_APPS.find(a => a.id === appId);
+                            if (app) {
+                                gridHtml += `
+                                    <div class="app-icon" data-app-id="${app.id}">
+                                        <div class="app-icon-circle"><i class="fa-solid ${app.icon}"></i></div>
+                                        <span class="app-icon-name">${app.name}</span>
+                                    </div>
+                                `;
+                            }
+                        });
+                        gridHtml += '</div>';
+                        drawerPanel.innerHTML = gridHtml;
+                        drawerPanel.querySelectorAll('.app-icon').forEach(icon => {
+                            icon.addEventListener('click', () => {
+                                const appId = icon.dataset.appId;
+                                if (appId === 'random_probability') {
+                                    showRandomProbabilityApp();
+                                    hideAppDrawer();
+                                }
+                            });
+                        });
+                    }
+                    drawerPanel.classList.add('open');
+                    document.addEventListener('click', function closeDrawer(e) {
+                        if (!drawerPanel.contains(e.target) && !drawerTrigger.contains(e.target)) {
+                            hideAppDrawer();
+                            document.removeEventListener('click', closeDrawer);
+                        }
+                    });
+                }
+                function hideAppDrawer() {
+                    drawerPanel.classList.remove('open');
+                }
+            }
+            function removeAppDrawer() {
+                if (drawerTrigger) drawerTrigger.remove();
+                if (drawerPanel) drawerPanel.remove();
+                drawerTrigger = null;
+                drawerPanel = null;
+            }
+
+            // 更多功能菜单（增加 App Store）
+            let activeMoreMenu = null;
+            function showMoreMenu(anchorBtn) {
+                if (activeMoreMenu) activeMoreMenu.remove();
+                const rect = anchorBtn.getBoundingClientRect();
+                const menu = document.createElement('div');
+                menu.className = 'more-menu';
+                menu.style.top = `${rect.bottom + 8}px`;
+                menu.style.left = `${rect.left}px`;
+                let menuHtml = `
+                    <div class="more-menu-item" data-action="clock">
+                        <i class="fa-regular fa-clock"></i> 全屏时钟
+                    </div>
+                `;
+                if (isSystemActivated()) {
+                    menuHtml += `
+                        <div class="more-menu-item" data-action="appstore">
+                            <i class="fa-solid fa-store"></i> App Store
+                        </div>
+                    `;
+                }
+                menuHtml += `<div class="more-menu-item" style="opacity:0.7;" data-action="coming"><i class="fa-regular fa-compass"></i> 更多工具 (即将推出)</div>`;
+                menu.innerHTML = menuHtml;
+                document.body.appendChild(menu);
+                activeMoreMenu = menu;
+                const handleClickOutside = (e) => {
+                    if (!menu.contains(e.target) && e.target !== anchorBtn) {
+                        menu.remove();
+                        activeMoreMenu = null;
+                        document.removeEventListener('click', handleClickOutside);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', handleClickOutside), 0);
+                menu.querySelector('[data-action="clock"]')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showFullscreenClock();
+                    menu.remove();
+                    activeMoreMenu = null;
+                    document.removeEventListener('click', handleClickOutside);
+                });
+                menu.querySelector('[data-action="appstore"]')?.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await showAppStoreModal();
+                    menu.remove();
+                    activeMoreMenu = null;
+                    document.removeEventListener('click', handleClickOutside);
+                });
+                menu.querySelector('[data-action="coming"]')?.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    alert('更多精彩功能正在开发中，敬请期待！');
+                    menu.remove();
+                    activeMoreMenu = null;
+                    document.removeEventListener('click', handleClickOutside);
+                });
+            }
+
+            // ---------- 原有数据函数 ----------
+            function getUsers() { const u = localStorage.getItem(STORAGE_USERS); return u ? JSON.parse(u) : []; }
+            function saveUsers(users) { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+            function getUserData(realName) {
+                const key = `userData_${realName}`;
+                const data = localStorage.getItem(key);
+                if (!data) return { classes: [], students: [], groups: [], profile: { ...defaultProfile }, installedApps: [], randomProbWeights: {} };
+                const parsed = JSON.parse(data);
+                if (!parsed.profile) parsed.profile = { ...defaultProfile };
+                if (!parsed.groups) parsed.groups = [];
+                if (parsed.profile.systemActivatedUntil === undefined) parsed.profile.systemActivatedUntil = 0;
+                if (!parsed.installedApps) parsed.installedApps = [];
+                if (!parsed.randomProbWeights) parsed.randomProbWeights = {};
+                return parsed;
+            }
+            function saveUserData(realName, data) { localStorage.setItem(`userData_${realName}`, JSON.stringify(data)); }
+
+            let currentUser = null;
+            let userData = { classes: [], students: [], groups: [], profile: { ...defaultProfile }, installedApps: [], randomProbWeights: {} };
+            let viewMode = 'list';
+            let currentClassId = null;
+            let classDetailTab = 'students';
+            let profileTemp = null;
+            let countdownInterval = null, stopwatchInterval = null;
+            let countdownTime = 300, stopwatchTime = 0, countdownRunning = false, stopwatchRunning = false;
+            const appDiv = document.getElementById('app');
+
+            function updateWatermark() {
+                let watermark = document.getElementById('global-system-watermark');
+                if (!watermark) {
+                    watermark = document.createElement('div');
+                    watermark.id = 'global-system-watermark';
+                    watermark.className = 'inactive-watermark';
+                    document.body.appendChild(watermark);
+                }
+                const isSystemActivatedNow = currentUser && (userData.profile?.systemActivatedUntil || 0) > Date.now();
+                if (currentUser && !isSystemActivatedNow) {
+                    watermark.style.display = 'flex';
+                    watermark.innerHTML = '<i class="fa-regular fa-hourglass-half"></i> 系统未激活';
+                } else {
+                    watermark.style.display = 'none';
+                }
+            }
+
+            function showPoweredByModal() {
+                const modalDiv = document.createElement('div');
+                modalDiv.className = 'modal-overlay';
+                modalDiv.innerHTML = `
+                    <div class="modal-content" style="text-align: center; max-width: 400px;">
+                        <h2><i class="fa-regular fa-star"></i> 关于版本</h2>
+                        <p style="font-size: 1.3rem; margin: 1.5rem 0; letter-spacing: 1px;">
+                            Powered by <strong style="background: linear-gradient(135deg, #ff6ec4, #f9a825, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: bold; font-size: 1.5rem;">shenlinOS</strong>
+                        </p>
+                        <button class="modal-close" id="powered-close">关闭</button>
+                    </div>
+                `;
+                document.body.appendChild(modalDiv);
+                const closeBtn = document.getElementById('powered-close');
+                if (closeBtn) closeBtn.addEventListener('click', () => document.body.removeChild(modalDiv));
+                modalDiv.addEventListener('click', (e) => { if (e.target === modalDiv) document.body.removeChild(modalDiv); });
+            }
+
+            function attachVersionClickEvent() {
+                const versionSpans = document.querySelectorAll('.logo .version');
+                versionSpans.forEach(span => {
+                    span.removeEventListener('click', showPoweredByModal);
+                    span.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        showPoweredByModal();
+                    });
+                });
+            }
+
+            function applyTheme() {
+                const savedTheme = localStorage.getItem(STORAGE_THEME) || 'dark';
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                document.body.classList.remove('light-mode', 'cartoon-mode');
+                if (savedTheme === 'light' && isVip) document.body.classList.add('light-mode');
+                else if (savedTheme === 'cartoon' && isVip) document.body.classList.add('cartoon-mode');
+                else if (savedTheme !== 'dark') localStorage.setItem(STORAGE_THEME, 'dark');
+            }
+
+            function clearAllTimers() {
+                if (countdownInterval) clearInterval(countdownInterval);
+                if (stopwatchInterval) clearInterval(stopwatchInterval);
+                countdownRunning = false; stopwatchRunning = false;
+            }
+
+            function tryAutoLogin() {
+                const keepLogin = localStorage.getItem(STORAGE_KEEP_LOGIN);
+                if (keepLogin !== 'true') return false;
+                const credStr = localStorage.getItem(STORAGE_REMEMBER);
+                if (!credStr) return false;
+                try {
+                    const { name, pass } = JSON.parse(credStr);
+                    if (!name || !pass) return false;
+                    const users = getUsers();
+                    const user = users.find(u => u.realName === name);
+                    if (user && user.password === pass) {
+                        currentUser = name;
+                        userData = getUserData(name);
+                        viewMode = 'list';
+                        currentClassId = null;
+                        resetHistoryAndPush();
+                        return true;
+                    } else {
+                        localStorage.removeItem(STORAGE_KEEP_LOGIN);
+                        localStorage.removeItem(STORAGE_REMEMBER);
+                        return false;
+                    }
+                } catch(e) {
+                    return false;
+                }
+            }
+
+            function showAgreement(type) {
+                const content = type === 'user' 
+                    ? '用户协议：欢迎使用少年沃积分管理。本软件仅供班级内部使用，请勿将账号泄露给他人。所有积分数据仅存储在您的浏览器本地，请定期备份。'
+                    : '隐私协议：我们非常重视您的隐私。本应用不会收集任何个人信息，所有数据仅保存在您的浏览器中，不会上传至任何服务器。';
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `<div class="modal-content"><h2>${type === 'user' ? '用户协议' : '隐私协议'}</h2><p>${content}</p><button class="modal-close" id="modal-close-btn">关闭</button></div>`;
+                document.body.appendChild(modal);
+                document.getElementById('modal-close-btn').addEventListener('click', () => document.body.removeChild(modal));
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+
+            function generateCaptcha() {
+                const a = Math.floor(Math.random() * 9) + 1;
+                const b = Math.floor(Math.random() * 9) + 1;
+                return { a, b, sum: a + b };
+            }
+
+            function refreshCaptcha(containerId) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const { a, b } = generateCaptcha();
+                container.querySelector('.captcha-question').innerText = `${a} + ${b} = ?`;
+            }
+
+            function showSwitchAccountModal() {
+                const users = getUsers().filter(u => u.realName !== currentUser);
+                if (users.length === 0) {
+                    alert('没有其他账号可切换');
+                    return;
+                }
+                const listModal = document.createElement('div');
+                listModal.className = 'modal-overlay';
+                listModal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>切换账号</h2>
+                        <p style="color:var(--text-secondary); margin-bottom:1rem;">点击账号，输入密码验证</p>
+                        <ul class="account-list">
+                            ${users.map(u => `<li class="account-item" data-name="${u.realName}" data-pass="${u.password}"><i class="fa-regular fa-circle-user"></i> ${u.realName}</li>`).join('')}
+                        </ul>
+                        <button class="modal-close" id="modal-close-btn">取消</button>
+                    </div>
+                `;
+                document.body.appendChild(listModal);
+                document.getElementById('modal-close-btn').addEventListener('click', () => document.body.removeChild(listModal));
+                
+                listModal.querySelectorAll('.account-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const targetName = item.dataset.name;
+                        const storedPass = item.dataset.pass;
+                        document.body.removeChild(listModal);
+                        
+                        const pwdModal = document.createElement('div');
+                        pwdModal.className = 'modal-overlay';
+                        pwdModal.innerHTML = `
+                            <div class="modal-content">
+                                <h2>验证密码</h2>
+                                <p style="margin-bottom:1rem;">账号：<strong>${targetName}</strong></p>
+                                <input type="password" id="switch-password" class="input-field" placeholder="请输入密码" style="margin-bottom:1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                    <button class="profile-btn secondary" id="switch-forgot-pwd" style="font-size:0.9rem; padding:0.4rem 1rem;">忘记密码？</button>
+                                    <div style="display: flex; gap:0.5rem;">
+                                        <button class="profile-btn secondary" id="switch-cancel">取消</button>
+                                        <button class="profile-btn" id="switch-confirm">确认切换</button>
+                                    </div>
+                                </div>
+                                <div id="switch-error" style="color: var(--danger); text-align: center; margin-top:0.5rem;"></div>
+                            </div>
+                        `;
+                        document.body.appendChild(pwdModal);
+                        
+                        const pwdInput = document.getElementById('switch-password');
+                        const confirmBtn = document.getElementById('switch-confirm');
+                        const cancelBtn = document.getElementById('switch-cancel');
+                        const forgotBtn = document.getElementById('switch-forgot-pwd');
+                        const errorDiv = document.getElementById('switch-error');
+                        
+                        const closeModal = () => document.body.removeChild(pwdModal);
+                        
+                        cancelBtn.addEventListener('click', closeModal);
+                        
+                        confirmBtn.addEventListener('click', () => {
+                            const enteredPass = pwdInput.value.trim();
+                            if (!enteredPass) {
+                                errorDiv.innerText = '请输入密码';
+                                return;
+                            }
+                            if (encodePass(enteredPass) === storedPass) {
+                                currentUser = targetName;
+                                userData = getUserData(targetName);
+                                localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name: targetName, pass: storedPass }));
+                                localStorage.setItem(STORAGE_KEEP_LOGIN, 'true');
+                                viewMode = 'list';
+                                currentClassId = null;
+                                resetHistoryAndPush();
+                                closeModal();
+                                renderApp();
+                            } else {
+                                errorDiv.innerText = '密码错误，请重试';
+                            }
+                        });
+                        
+                        forgotBtn.addEventListener('click', () => {
+                            closeModal();
+                            showForgotPasswordModal();
+                        });
+                        
+                        pwdModal.addEventListener('click', (e) => {
+                            if (e.target === pwdModal) closeModal();
+                        });
+                    });
+                });
+                
+                listModal.addEventListener('click', (e) => {
+                    if (e.target === listModal) document.body.removeChild(listModal);
+                });
+            }
+
+            function showForgotPasswordModal() {
+                const captcha = generateCaptcha();
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h2>找回密码</h2>
+                        <div style="margin: 1.5rem 0;">
+                            <input type="text" id="forgot-name" class="input-field" placeholder="输入真实姓名" style="margin-bottom: 1rem;">
+                            <div class="captcha-row" id="forgot-captcha-container">
+                                <span class="captcha-question">${captcha.a} + ${captcha.b} = ?</span>
+                                <input type="text" class="captcha-input" id="forgot-captcha-answer" placeholder="答案">
+                                <button class="captcha-refresh" id="forgot-refresh-captcha" type="button"><i class="fa-solid fa-rotate-right"></i></button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button class="profile-btn secondary" id="forgot-cancel">取消</button>
+                            <button class="profile-btn" id="forgot-submit">找回密码</button>
+                        </div>
+                        <div id="forgot-result" style="margin-top: 1rem; text-align: center;"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                document.getElementById('forgot-cancel').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+                document.getElementById('forgot-refresh-captcha').addEventListener('click', () => {
+                    const container = document.getElementById('forgot-captcha-container');
+                    const { a, b } = generateCaptcha();
+                    container.querySelector('.captcha-question').innerText = `${a} + ${b} = ?`;
+                });
+                document.getElementById('forgot-submit').addEventListener('click', () => {
+                    const name = document.getElementById('forgot-name').value.trim();
+                    const answer = parseInt(document.getElementById('forgot-captcha-answer').value.trim());
+                    const questionElem = document.querySelector('#forgot-captcha-container .captcha-question');
+                    const questionText = questionElem.innerText;
+                    const match = questionText.match(/(\d+)\s*\+\s*(\d+)\s*=\s*\?/);
+                    if (!match) {
+                        document.getElementById('forgot-result').innerText = '验证码错误，请刷新重试';
+                        return;
+                    }
+                    const correct = parseInt(match[1]) + parseInt(match[2]);
+                    if (isNaN(answer) || answer !== correct) {
+                        document.getElementById('forgot-result').innerText = '人机验证答案错误';
+                        return;
+                    }
+                    if (!name) {
+                        document.getElementById('forgot-result').innerText = '请输入真实姓名';
+                        return;
+                    }
+                    const users = getUsers();
+                    const user = users.find(u => u.realName === name);
+                    if (!user) {
+                        document.getElementById('forgot-result').innerText = '该账号不存在';
+                        return;
+                    }
+                    const plainPassword = decodePass(user.password);
+                    document.getElementById('forgot-result').innerHTML = `<span style="color: var(--success);">您的密码是：<strong>${plainPassword}</strong></span>`;
+                });
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) document.body.removeChild(modal);
+                });
+            }
+
+            const COPYRIGHT_TEXT = '我已阅读并同意《版权归属：少年沃所有，请勿抄袭》';
+
+            function showChangePasswordModal() {
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 400px;">
+                        <h2><i class="fa-solid fa-key"></i> 修改密码</h2>
+                        <div style="margin: 1.5rem 0;">
+                            <input type="password" id="old-pwd" class="input-field" placeholder="原密码" style="margin-bottom: 1rem;">
+                            <input type="password" id="new-pwd" class="input-field" placeholder="新密码" style="margin-bottom: 1rem;">
+                            <input type="password" id="confirm-pwd" class="input-field" placeholder="确认新密码">
+                        </div>
+                        <div id="pwd-change-error" style="color: var(--danger); text-align: center; margin-bottom: 1rem;"></div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                            <button class="profile-btn secondary" id="pwd-cancel">取消</button>
+                            <button class="profile-btn" id="pwd-submit">确认修改</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                const oldInput = document.getElementById('old-pwd');
+                const newInput = document.getElementById('new-pwd');
+                const confirmInput = document.getElementById('confirm-pwd');
+                const errorDiv = document.getElementById('pwd-change-error');
+                const cancelBtn = document.getElementById('pwd-cancel');
+                const submitBtn = document.getElementById('pwd-submit');
+                
+                const closeModal = () => document.body.removeChild(modal);
+                cancelBtn.addEventListener('click', closeModal);
+                
+                submitBtn.addEventListener('click', () => {
+                    const oldPwd = oldInput.value.trim();
+                    const newPwd = newInput.value.trim();
+                    const confirmPwd = confirmInput.value.trim();
+                    
+                    if (!oldPwd || !newPwd || !confirmPwd) {
+                        errorDiv.innerText = '请填写所有字段';
+                        return;
+                    }
+                    if (newPwd !== confirmPwd) {
+                        errorDiv.innerText = '两次输入的新密码不一致';
+                        return;
+                    }
+                    if (newPwd.length < 1) {
+                        errorDiv.innerText = '新密码不能为空';
+                        return;
+                    }
+                    
+                    const users = getUsers();
+                    const userIndex = users.findIndex(u => u.realName === currentUser);
+                    if (userIndex === -1) {
+                        errorDiv.innerText = '用户不存在，请重新登录';
+                        return;
+                    }
+                    const storedEncoded = users[userIndex].password;
+                    if (encodePass(oldPwd) !== storedEncoded) {
+                        errorDiv.innerText = '原密码错误';
+                        return;
+                    }
+                    
+                    const newEncoded = encodePass(newPwd);
+                    users[userIndex].password = newEncoded;
+                    saveUsers(users);
+                    
+                    const rememberCred = localStorage.getItem(STORAGE_REMEMBER);
+                    if (rememberCred) {
+                        try {
+                            const cred = JSON.parse(rememberCred);
+                            if (cred.name === currentUser) {
+                                localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name: currentUser, pass: newEncoded }));
+                            }
+                        } catch(e) {}
+                    }
+                    const keepLogin = localStorage.getItem(STORAGE_KEEP_LOGIN);
+                    if (keepLogin === 'true') {
+                        localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name: currentUser, pass: newEncoded }));
+                    }
+                    
+                    alert('密码修改成功！请重新登录。');
+                    currentUser = null;
+                    localStorage.removeItem(STORAGE_KEEP_LOGIN);
+                    localStorage.removeItem(STORAGE_REMEMBER);
+                    renderApp();
+                    closeModal();
+                });
+                
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+
+            function renderAuth() {
+                let savedName = '', savedPass = '';
+                const rememberCred = localStorage.getItem(STORAGE_REMEMBER);
+                if (rememberCred) {
+                    try {
+                        const cred = JSON.parse(rememberCred);
+                        savedName = cred.name || '';
+                        savedPass = cred.pass ? decodePass(cred.pass) : '';
+                    } catch (e) {}
+                }
+                const loginCaptcha = generateCaptcha();
+                const regCaptcha = generateCaptcha();
+                const html = `
+                    <div class="app-header"><div class="logo"><h1>少年沃积分管理 <span class="version">${VERSION_STRING}</span></h1></div><div></div></div>
+                    <div class="auth-container"><div class="auth-card"><div class="auth-tabs"><button class="auth-tab active" id="tab-login">登录</button><button class="auth-tab" id="tab-reg">注册</button></div>
+                    <div id="auth-form-container">
+                        <div class="auth-form" id="login-form">
+                            <input type="text" class="input-field" id="login-name" placeholder="真实姓名" value="${savedName}" autocomplete="off">
+                            <input type="password" class="input-field" id="login-pass" placeholder="密码" value="${savedPass}">
+                            <div class="checkbox-row"><input type="checkbox" id="remember-check" ${rememberCred ? 'checked' : ''}><label for="remember-check">记住账号密码</label></div>
+                            <div class="captcha-row" id="login-captcha-container"><span class="captcha-question">${loginCaptcha.a} + ${loginCaptcha.b} = ?</span><input type="text" class="captcha-input" id="login-captcha-answer" placeholder="答案"><button class="captcha-refresh" id="login-refresh-captcha" type="button"><i class="fa-solid fa-rotate-right"></i></button></div>
+                            <div class="checkbox-row"><input type="checkbox" id="login-agree-check"><label for="login-agree-check">我已阅读并同意 <a id="show-user-agreement-login">《用户协议》</a> 和 <a id="show-privacy-agreement-login">《隐私协议》</a></label></div>
+                            <div class="checkbox-row"><input type="checkbox" id="login-copyright-check"><label for="login-copyright-check" style="color: #ffaa00;">${COPYRIGHT_TEXT}</label></div>
+                            <div class="forgot-password-link" id="forgot-password-link">忘记密码？</div>
+                            <button class="btn-primary" id="login-btn">进入积分世界</button>
+                            <div class="auth-message" id="login-message"></div>
+                        </div>
+                        <div class="auth-form" id="register-form" style="display:none;">
+                            <input type="text" class="input-field" id="reg-name" placeholder="真实姓名 (唯一)" autocomplete="off">
+                            <input type="password" class="input-field" id="reg-pass" placeholder="密码">
+                            <input type="password" class="input-field" id="reg-confirm" placeholder="确认密码">
+                            <div class="captcha-row" id="reg-captcha-container"><span class="captcha-question">${regCaptcha.a} + ${regCaptcha.b} = ?</span><input type="text" class="captcha-input" id="reg-captcha-answer" placeholder="答案"><button class="captcha-refresh" id="reg-refresh-captcha" type="button"><i class="fa-solid fa-rotate-right"></i></button></div>
+                            <div class="checkbox-row"><input type="checkbox" id="reg-agree-check"><label for="reg-agree-check">我已阅读并同意 <a id="show-user-agreement-reg">《用户协议》</a> 和 <a id="show-privacy-agreement-reg">《隐私协议》</a></label></div>
+                            <div class="checkbox-row"><input type="checkbox" id="reg-copyright-check"><label for="reg-copyright-check" style="color: #ffaa00;">${COPYRIGHT_TEXT}</label></div>
+                            <button class="btn-primary" id="register-btn">注册新账户</button>
+                            <div class="auth-message" id="reg-message"></div>
+                        </div>
+                    </div></div></div>
+                `;
+                appDiv.innerHTML = html;
+                attachVersionClickEvent();
+                document.getElementById('tab-login').addEventListener('click', () => {
+                    document.getElementById('tab-login').classList.add('active');
+                    document.getElementById('tab-reg').classList.remove('active');
+                    document.getElementById('login-form').style.display = 'flex';
+                    document.getElementById('register-form').style.display = 'none';
+                });
+                document.getElementById('tab-reg').addEventListener('click', () => {
+                    document.getElementById('tab-reg').classList.add('active');
+                    document.getElementById('tab-login').classList.remove('active');
+                    document.getElementById('register-form').style.display = 'flex';
+                    document.getElementById('login-form').style.display = 'none';
+                });
+                document.getElementById('show-user-agreement-login')?.addEventListener('click', (e) => { e.preventDefault(); showAgreement('user'); });
+                document.getElementById('show-privacy-agreement-login')?.addEventListener('click', (e) => { e.preventDefault(); showAgreement('privacy'); });
+                document.getElementById('show-user-agreement-reg')?.addEventListener('click', (e) => { e.preventDefault(); showAgreement('user'); });
+                document.getElementById('show-privacy-agreement-reg')?.addEventListener('click', (e) => { e.preventDefault(); showAgreement('privacy'); });
+                document.getElementById('login-refresh-captcha')?.addEventListener('click', () => refreshCaptcha('login-captcha-container'));
+                document.getElementById('reg-refresh-captcha')?.addEventListener('click', () => refreshCaptcha('reg-captcha-container'));
+                document.getElementById('forgot-password-link').addEventListener('click', (e) => { e.preventDefault(); showForgotPasswordModal(); });
+                document.getElementById('login-btn').addEventListener('click', () => {
+                    const name = document.getElementById('login-name').value.trim();
+                    const pass = document.getElementById('login-pass').value.trim();
+                    const msg = document.getElementById('login-message');
+                    const agree = document.getElementById('login-agree-check').checked;
+                    const copyrightAgree = document.getElementById('login-copyright-check').checked;
+                    if (!agree) { msg.innerText = '请先阅读并同意用户协议和隐私协议'; return; }
+                    if (!copyrightAgree) { msg.innerText = '请先勾选版权归属声明'; return; }
+                    const questionElem = document.querySelector('#login-captcha-container .captcha-question');
+                    const match = questionElem.innerText.match(/(\d+)\s*\+\s*(\d+)\s*=\s*\?/);
+                    if (!match) { msg.innerText = '验证码错误，请刷新重试'; return; }
+                    const correct = parseInt(match[1]) + parseInt(match[2]);
+                    const answer = parseInt(document.getElementById('login-captcha-answer').value.trim());
+                    if (isNaN(answer) || answer !== correct) { msg.innerText = '人机验证答案错误'; return; }
+                    if (!name || !pass) { msg.innerText = '真实姓名和密码都不能为空'; return; }
+                    const users = getUsers();
+                    const user = users.find(u => u.realName === name);
+                    if (!user || user.password !== encodePass(pass)) { msg.innerText = '姓名或密码错误'; return; }
+                    currentUser = name;
+                    userData = getUserData(name);
+                    const remember = document.getElementById('remember-check').checked;
+                    if (remember) localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name, pass: encodePass(pass) }));
+                    else localStorage.removeItem(STORAGE_REMEMBER);
+                    if (confirm('登录成功！是否保持登录状态，下次自动登录？')) {
+                        localStorage.setItem(STORAGE_KEEP_LOGIN, 'true');
+                        if (!remember) localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name, pass: encodePass(pass) }));
+                    } else localStorage.removeItem(STORAGE_KEEP_LOGIN);
+                    viewMode = 'list';
+                    currentClassId = null;
+                    resetHistoryAndPush();
+                    renderApp();
+                });
+                
+                document.getElementById('register-btn').addEventListener('click', () => {
+                    try {
+                        const name = document.getElementById('reg-name').value.trim();
+                        const pass = document.getElementById('reg-pass').value.trim();
+                        const confirmPwd = document.getElementById('reg-confirm').value.trim();
+                        const msg = document.getElementById('reg-message');
+                        const agree = document.getElementById('reg-agree-check').checked;
+                        const copyrightAgree = document.getElementById('reg-copyright-check').checked;
+                        
+                        if (!agree) { msg.innerText = '请先阅读并同意用户协议和隐私协议'; return; }
+                        if (!copyrightAgree) { msg.innerText = '请先勾选版权归属声明'; return; }
+                        
+                        const questionElem = document.querySelector('#reg-captcha-container .captcha-question');
+                        if (!questionElem) { msg.innerText = '验证码组件错误，请刷新页面重试'; return; }
+                        const match = questionElem.innerText.match(/(\d+)\s*\+\s*(\d+)\s*=\s*\?/);
+                        if (!match) { msg.innerText = '验证码格式错误，请刷新重试'; return; }
+                        const correct = parseInt(match[1]) + parseInt(match[2]);
+                        const answer = parseInt(document.getElementById('reg-captcha-answer').value.trim());
+                        if (isNaN(answer) || answer !== correct) { msg.innerText = '人机验证答案错误'; return; }
+                        if (!name || !pass) { msg.innerText = '真实姓名和密码必须填写'; return; }
+                        if (pass !== confirmPwd) { msg.innerText = '两次密码不一致'; return; }
+                        
+                        const users = getUsers();
+                        if (users.some(u => u.realName === name)) { msg.innerText = '该真实姓名已注册'; return; }
+                        
+                        let encodedPass;
+                        try {
+                            encodedPass = encodePass(pass);
+                        } catch(encErr) {
+                            msg.innerText = '密码包含非法字符，请使用字母数字组合';
+                            return;
+                        }
+                        
+                        users.push({ realName: name, password: encodedPass });
+                        saveUsers(users);
+                        
+                        const newProfile = {
+                            ...defaultProfile,
+                            avatar: name.charAt(0).toUpperCase(),
+                            gender: '保密',
+                            vipExpire: 0,
+                            systemActivatedUntil: 0
+                        };
+                        saveUserData(name, { classes: [], students: [], groups: [], profile: newProfile, installedApps: [], randomProbWeights: {} });
+                        
+                        currentUser = name;
+                        userData = getUserData(name);
+                        
+                        if (!userData.profile) userData.profile = { ...defaultProfile };
+                        if (userData.profile.systemActivatedUntil === undefined) userData.profile.systemActivatedUntil = 0;
+                        if (userData.profile.vipExpire === undefined) userData.profile.vipExpire = 0;
+                        saveUserData(name, userData);
+                        
+                        if (confirm('注册成功！是否保持登录状态，下次自动登录？')) {
+                            localStorage.setItem(STORAGE_KEEP_LOGIN, 'true');
+                            localStorage.setItem(STORAGE_REMEMBER, JSON.stringify({ name, pass: encodedPass }));
+                        } else {
+                            localStorage.removeItem(STORAGE_KEEP_LOGIN);
+                            localStorage.removeItem(STORAGE_REMEMBER);
+                        }
+                        viewMode = 'list';
+                        currentClassId = null;
+                        resetHistoryAndPush();
+                        renderApp();
+                    } catch (err) {
+                        console.error('注册过程发生异常:', err);
+                        const msgDiv = document.getElementById('reg-message');
+                        if (msgDiv) msgDiv.innerText = '注册失败，请稍后重试。错误：' + (err.message || '未知错误');
+                        else alert('注册失败，请刷新页面后重试');
+                    }
+                });
+            }
+
+            function showProfile() { viewMode = 'profile'; profileTemp = { ...userData.profile }; renderProfile(); }
+            function renderProfile() {
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                const expireDate = isVip ? new Date(userData.profile.vipExpire).toLocaleDateString() : '未开通';
+                const avatarChar = userData.profile.avatar || currentUser.charAt(0).toUpperCase();
+                const html = `
+                    <div class="app-header"><div class="logo"><h1>少年沃积分管理 · 个人主页 <span class="version">${VERSION_STRING}</span></h1></div><div class="user-area"><div class="user-greeting"><i class="fa-regular fa-circle-user"></i> ${currentUser} ${isVip ? '<span class="svip-badge-user"><i class="fa-regular fa-gem"></i> SVIP</span>' : ''}</div><button class="btn-icon" id="switch-account-profile"><i class="fa-solid fa-arrow-right-arrow-left"></i> 切换</button><button class="btn-icon" id="close-profile"><i class="fa-solid fa-xmark"></i> 关闭</button></div></div>
+                    <div class="main-container" style="display: flex; justify-content: center;"><div class="profile-card"><div class="profile-avatar">${avatarChar}</div><div class="profile-field"><label>真实姓名</label><input type="text" value="${currentUser}" disabled></div><div class="profile-field"><label>性别</label><select id="profile-gender"><option value="保密" ${profileTemp.gender === '保密' ? 'selected' : ''}>保密</option><option value="男" ${profileTemp.gender === '男' ? 'selected' : ''}>男</option><option value="女" ${profileTemp.gender === '女' ? 'selected' : ''}>女</option></select></div><div class="profile-field"><label>头像字符</label><input type="text" id="profile-avatar" value="${profileTemp.avatar || ''}" placeholder="例如: 😊"></div>
+                        <div style="margin: 1rem 0;"><button class="profile-btn" id="change-password-btn" style="background: #f59e0b; width: 100%;"><i class="fa-solid fa-key"></i> 修改密码</button></div>
+                        <div class="svip-section"><div><span class="svip-badge">${isVip ? 'SVIP' : '普通会员'}</span><span style="margin-left:1rem;">${isVip ? '有效期至 ' + expireDate : '开通SVIP可享浅色主题及专属工具'}</span></div>${!isVip ? '<button class="svip-btn" id="get-svip">免费领取7天SVIP</button>' : ''}</div><div class="profile-field"><label>主题偏好 (浅色/卡通需要SVIP)</label><select id="theme-select" ${!isVip ? 'disabled' : ''}><option value="dark" ${localStorage.getItem(STORAGE_THEME) === 'dark' ? 'selected' : ''}>深色模式</option><option value="light" ${localStorage.getItem(STORAGE_THEME) === 'light' ? 'selected' : ''}>浅色模式</option><option value="cartoon" ${localStorage.getItem(STORAGE_THEME) === 'cartoon' ? 'selected' : ''}>卡通主题</option></select>${!isVip ? '<p style="color:var(--danger);">开通SVIP后可选浅色/卡通模式</p>' : ''}</div>${isVip ? `<div class="svip-features"><h3><i class="fa-regular fa-gem"></i> SVIP专属实验室</h3><div class="feature-grid"><div class="feature-card"><h4>倒计时</h4><div class="timer-display" id="countdown-display">05:00</div><div class="timer-controls"><button class="timer-btn" id="countdown-start">开始</button><button class="timer-btn secondary" id="countdown-pause">暂停</button><button class="timer-btn secondary" id="countdown-reset">重置</button></div><div><input type="number" id="countdown-set" value="5" min="1" max="60" style="width:70px;background:var(--bg-input);border-radius:60px;padding:0.3rem;"> 分钟</div></div><div class="feature-card"><h4>秒表</h4><div class="timer-display" id="stopwatch-display">00:00.0</div><div class="stopwatch-controls"><button class="timer-btn" id="stopwatch-start">开始</button><button class="timer-btn secondary" id="stopwatch-pause">暂停</button><button class="timer-btn secondary" id="stopwatch-reset">重置</button></div></div></div></div>` : ''}<div class="profile-actions"><button class="profile-btn secondary" id="profile-cancel">取消</button><button class="profile-btn" id="profile-save">保存修改</button></div></div></div>
+                `;
+                appDiv.innerHTML = html;
+                attachVersionClickEvent();
+                document.getElementById('close-profile').addEventListener('click', () => { viewMode = 'list'; renderApp(); });
+                document.getElementById('profile-cancel').addEventListener('click', () => { viewMode = 'list'; renderApp(); });
+                document.getElementById('profile-save').addEventListener('click', () => {
+                    if (!confirm('确定保存个人资料修改吗？')) return;
+                    userData.profile.gender = document.getElementById('profile-gender').value;
+                    userData.profile.avatar = document.getElementById('profile-avatar').value.trim() || currentUser.charAt(0).toUpperCase();
+                    const theme = document.getElementById('theme-select').value;
+                    localStorage.setItem(STORAGE_THEME, theme);
+                    saveUserData(currentUser, userData);
+                    applyTheme();
+                    viewMode = 'list';
+                    renderApp();
+                });
+                document.getElementById('get-svip')?.addEventListener('click', () => { if(confirm('免费领取7天SVIP会员，确定吗？')){ userData.profile.vipExpire = Date.now() + 7*24*60*60*1000; saveUserData(currentUser, userData); alert('获得SVIP！'); renderProfile(); } });
+                document.getElementById('switch-account-profile')?.addEventListener('click', () => showSwitchAccountModal());
+                document.getElementById('change-password-btn')?.addEventListener('click', () => showChangePasswordModal());
+                if(isVip){
+                    let cdownTime=300, swTime=0, cdownInt=null, swInt=null, cdownRun=false, swRun=false;
+                    const cdownDisplay=document.getElementById('countdown-display'), swDisplay=document.getElementById('stopwatch-display');
+                    const updateCdown=()=>{ let m=Math.floor(cdownTime/60), s=cdownTime%60; cdownDisplay.textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; };
+                    updateCdown();
+                    document.getElementById('countdown-start').onclick=()=>{ if(cdownRun)return; cdownRun=true; cdownInt=setInterval(()=>{ if(cdownTime>0){ cdownTime--; updateCdown();} else{ clearInterval(cdownInt); cdownRun=false; alert('倒计时结束');}},1000);};
+                    document.getElementById('countdown-pause').onclick=()=>{ clearInterval(cdownInt); cdownRun=false;};
+                    document.getElementById('countdown-reset').onclick=()=>{ clearInterval(cdownInt); cdownRun=false; let mins=parseInt(document.getElementById('countdown-set').value)||5; cdownTime=mins*60; updateCdown();};
+                    const updateSw=()=>{ let ts=Math.floor(swTime), m=Math.floor(ts/60), s=ts%60, t=Math.floor((swTime-ts)*10); swDisplay.textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}.${t}`; };
+                    updateSw();
+                    document.getElementById('stopwatch-start').onclick=()=>{ if(swRun)return; swRun=true; let start=Date.now()-swTime*1000; swInt=setInterval(()=>{ swTime=(Date.now()-start)/1000; updateSw();},100);};
+                    document.getElementById('stopwatch-pause').onclick=()=>{ clearInterval(swInt); swRun=false;};
+                    document.getElementById('stopwatch-reset').onclick=()=>{ clearInterval(swInt); swRun=false; swTime=0; updateSw();};
+                }
+                updateWatermark();
+            }
+
+            function showGlobalSettings() {
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                const currentTheme = localStorage.getItem(STORAGE_THEME) || 'dark';
+                let clickCount = 0, clickTimer = null;
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 450px;">
+                        <h2><i class="fa-solid fa-gear"></i> 全局设置</h2>
+                        <div style="margin: 1.5rem 0;">
+                            <label style="color: var(--text-secondary); display: block; margin-bottom: 0.5rem;">主题偏好</label>
+                            <select id="settings-theme" class="input-field" ${!isVip ? 'disabled' : ''}>
+                                <option value="dark" ${currentTheme === 'dark' ? 'selected' : ''}>深色模式</option>
+                                <option value="light" ${currentTheme === 'light' ? 'selected' : ''}>浅色模式</option>
+                                <option value="cartoon" ${currentTheme === 'cartoon' ? 'selected' : ''}>卡通主题</option>
+                            </select>
+                            ${!isVip ? '<p style="color: var(--danger); margin-top: 0.5rem;">开通SVIP后可切换浅色/卡通主题</p>' : ''}
+                        </div>
+                        <div style="border-top: 1px solid var(--border-muted); margin: 1rem 0 0.5rem 0; padding-top: 1rem;">
+                            <label style="color: var(--text-secondary); display: block; margin-bottom: 0.5rem;"><i class="fa-regular fa-key"></i> 永久激活码 (激活系统)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="activation-code" class="input-field" placeholder="输入激活码" style="flex:1;">
+                                <button id="activate-btn" class="profile-btn" style="white-space: nowrap;">激活</button>
+                            </div>
+                            <div id="activation-status" style="font-size:0.8rem; margin-top:6px; color: var(--text-tertiary);"></div>
+                        </div>
+                        <div style="border-top: 1px solid var(--border-muted); margin: 1rem 0 0.5rem 0; padding-top: 1rem;">
+                            <button id="trial-7days-btn" class="profile-btn" style="width:100%; background: #f59e0b;"><i class="fa-regular fa-clock"></i> 🎁 创建7天激活码 (试用激活系统7天)</button>
+                            <div style="font-size:0.7rem; margin-top:6px; color: var(--text-tertiary);">点击后立即激活系统7天，水印消失</div>
+                        </div>
+                        <div style="border-top: 1px solid var(--border-muted); padding-top: 1rem; margin-top: 0.5rem; text-align: center;">
+                            <span id="shaonianwo-text" style="font-size: 0.9rem; color: var(--text-tertiary); cursor: pointer; user-select: none;">少年沃 · 积木育人</span>
+                        </div>
+                        <div id="dev-mode-area" style="margin-top: 1rem; text-align: center;">
+                            ${devModeEnabled ? `<div style="background:rgba(255,80,80,0.2); border-radius:60px; padding:0.8rem; margin-top:0.5rem;">
+                                <span style="color:#ff8888;"><i class="fa-solid fa-flask"></i> 开发者模式已激活</span>
+                                <div style="display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem;">
+                                    <button id="dev-crash-trigger" class="dev-crash-btn"><i class="fa-solid fa-skull"></i> 卡死按钮</button>
+                                    <button id="dev-close-trigger" class="dev-close-btn"><i class="fa-solid fa-power-off"></i> 关闭开发者模式</button>
+                                </div>
+                                <p style="font-size:0.7rem; margin-top:6px;">⚠️ 卡死按钮：红屏并彻底卡死，需刷新页面</p>
+                            </div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                            <button class="profile-btn secondary" id="settings-cancel">取消</button>
+                            <button class="profile-btn" id="settings-save">保存</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                const activateBtn = document.getElementById('activate-btn');
+                const activationInput = document.getElementById('activation-code');
+                const activationStatus = document.getElementById('activation-status');
+                if (activateBtn && activationInput) {
+                    activateBtn.addEventListener('click', () => {
+                        const code = activationInput.value.trim();
+                        if (!code) {
+                            if(activationStatus) activationStatus.innerText = '请输入激活码';
+                            return;
+                        }
+                        if (code.toUpperCase() === 'SHENLINOSNEXT') {
+                            const foreverTime = Date.now() + 100 * 365 * 24 * 60 * 60 * 1000;
+                            userData.profile.systemActivatedUntil = foreverTime;
+                            saveUserData(currentUser, userData);
+                            if(activationStatus) activationStatus.innerText = '✅ 系统永久激活成功！水印已移除。';
+                            setTimeout(() => {
+                                document.body.removeChild(modal);
+                                renderApp();
+                                alert('系统永久激活成功！右下角水印已消失。');
+                            }, 800);
+                        } else {
+                            if(activationStatus) activationStatus.innerText = '❌ 激活码无效，请重试';
+                        }
+                    });
+                }
+                
+                const trialBtn = document.getElementById('trial-7days-btn');
+                if (trialBtn) {
+                    trialBtn.addEventListener('click', () => {
+                        const newExpire = Date.now() + 7 * 24 * 60 * 60 * 1000;
+                        userData.profile.systemActivatedUntil = newExpire;
+                        saveUserData(currentUser, userData);
+                        alert('✅ 系统已激活7天！水印将消失，刷新界面后生效。');
+                        document.body.removeChild(modal);
+                        renderApp();
+                    });
+                }
+                
+                const shaonianElem = document.getElementById('shaonianwo-text');
+                if (shaonianElem) {
+                    shaonianElem.addEventListener('click', () => {
+                        if (clickTimer) clearTimeout(clickTimer);
+                        clickCount++;
+                        if (clickCount === 7) {
+                            if (!devModeEnabled) {
+                                saveDevModeState(true);
+                                alert('🔧 开发者模式已开启！重新打开设置即可看到“卡死按钮”和“关闭开发者模式”按钮。');
+                                document.body.removeChild(modal);
+                                showGlobalSettings();
+                            } else { alert('开发者模式已经是开启状态'); }
+                            clickCount = 0;
+                        } else { clickTimer = setTimeout(() => { clickCount = 0; }, 1000); }
+                    });
+                }
+                document.getElementById('settings-cancel')?.addEventListener('click', () => document.body.removeChild(modal));
+                document.getElementById('settings-save')?.addEventListener('click', () => {
+                    const themeSelect = document.getElementById('settings-theme');
+                    if (themeSelect && !themeSelect.disabled) {
+                        localStorage.setItem(STORAGE_THEME, themeSelect.value);
+                        applyTheme();
+                    }
+                    document.body.removeChild(modal);
+                    if (viewMode === 'list') renderClassList();
+                    else if (viewMode === 'detail') renderClassDetail();
+                    else if (viewMode === 'profile') renderProfile();
+                });
+                const crashBtn = document.getElementById('dev-crash-trigger');
+                if (crashBtn) crashBtn.addEventListener('click', () => triggerCrashForDev());
+                const closeDevBtn = document.getElementById('dev-close-trigger');
+                if (closeDevBtn) {
+                    closeDevBtn.addEventListener('click', () => {
+                        if (confirm('确定要关闭开发者模式吗？卡死按钮和开发者功能将被禁用。')) {
+                            saveDevModeState(false);
+                            alert('开发者模式已关闭。');
+                            document.body.removeChild(modal);
+                            showGlobalSettings();
+                        }
+                    });
+                }
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+
+            function exportData() {
+                const dataStr = JSON.stringify(userData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `班级积分备份_${currentUser}_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+            function importDataFromFile(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (imported && Array.isArray(imported.classes) && Array.isArray(imported.students)) {
+                            if (!confirm('导入将覆盖当前所有班级和学生数据，确定吗？')) return;
+                            userData = imported;
+                            if (!userData.groups) userData.groups = [];
+                            if (!userData.profile) userData.profile = { ...defaultProfile };
+                            if (userData.profile.systemActivatedUntil === undefined) userData.profile.systemActivatedUntil = 0;
+                            if (!userData.installedApps) userData.installedApps = [];
+                            if (!userData.randomProbWeights) userData.randomProbWeights = {};
+                            saveUserData(currentUser, userData);
+                            resetHistoryAndPush();
+                            renderMain();
+                        } else alert('文件格式错误：缺少classes或students数组');
+                    } catch (err) { alert('无效的JSON文件'); }
+                };
+                reader.readAsText(file);
+            }
+            function showClassRankings() {
+                const classes = userData.classes.map(cls => {
+                    const students = userData.students.filter(s => s.classId === cls.id);
+                    const totalPoints = students.reduce((sum, s) => sum + s.points, 0);
+                    return { name: cls.name, studentCount: students.length, totalPoints };
+                }).sort((a, b) => b.totalPoints - a.totalPoints || a.studentCount - b.studentCount);
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `<div class="modal-content" style="max-width: 600px;"><h2><i class="fa-solid fa-trophy" style="color: gold;"></i> 班级总分排行榜</h2><ul style="list-style: none; padding: 0; max-height: 400px; overflow-y: auto; margin: 1.5rem 0;">${classes.length === 0 ? '<li style="text-align: center;">暂无班级数据</li>' : ''}${classes.map((c, index) => `<li style="display: flex; align-items: center; gap: 12px; padding: 0.8rem; background: var(--bg-input); border-radius: 60px; margin-bottom: 0.5rem;"><span class="rank-badge">${index + 1}</span><span style="flex: 1; font-weight: 600;">${c.name}</span><span style="color: var(--text-secondary);">${c.studentCount}人</span><span style="color: var(--warning); font-weight: 700;">${c.totalPoints}分</span></li>`).join('')}</ul><button class="modal-close" id="rankings-close">关闭</button></div>`;
+                document.body.appendChild(modal);
+                document.getElementById('rankings-close').addEventListener('click', () => document.body.removeChild(modal));
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+            
+            function showStudentRankingsInClass() {
+                const cls = userData.classes.find(c => c.id === currentClassId);
+                if (!cls) return;
+                let students = userData.students
+                    .filter(s => s.classId === currentClassId)
+                    .map(s => ({ name: s.name, points: s.points }))
+                    .sort((a, b) => {
+                        if (b.points !== a.points) return b.points - a.points;
+                        return a.name.localeCompare(b.name);
+                    });
+                
+                const total = students.length;
+                let listHtml = '';
+                for (let i = 0; i < students.length; i++) {
+                    const s = students[i];
+                    const rank = i + 1;
+                    let extraHtml = '';
+                    if (rank <= 12) {
+                        extraHtml = `<span style="display: inline-block; margin-left: 8px; background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; background-clip: text; color: transparent; font-weight: bold; font-size: 0.9rem;">✨ 真棒！</span>`;
+                    } 
+                    else if (rank > total - 3) {
+                        extraHtml = `<span style="display: inline-block; margin-left: 8px; color: #f97316; font-weight: bold; background: #ffedd5; padding: 2px 8px; border-radius: 40px; font-size: 0.8rem;">😭 菜就多练</span>`;
+                    }
+                    const safeName = escapeHtml(s.name);
+                    listHtml += `<li style="display: flex; align-items: center; gap: 12px; padding: 0.8rem; background: var(--bg-input); border-radius: 60px; margin-bottom: 0.5rem;">
+                        <span class="rank-badge">${rank}</span>
+                        <span style="flex: 1; font-weight: 600;">${safeName}${extraHtml}</span>
+                        <span style="color: var(--warning); font-weight: 700;">${s.points}分</span>
+                    </li>`;
+                }
+                if (students.length === 0) listHtml = '<li style="text-align: center;">暂无学生数据</li>';
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `<div class="modal-content" style="max-width: 600px;"><h2><i class="fa-solid fa-ranking-star"></i> 班级学生积分榜 · ${escapeHtml(cls.name)}</h2><ul style="list-style: none; padding: 0; max-height: 400px; overflow-y: auto; margin: 1.5rem 0;">${listHtml}</ul><button class="modal-close" id="closeRank">关闭</button></div>`;
+                document.body.appendChild(modal);
+                document.getElementById('closeRank').addEventListener('click', () => document.body.removeChild(modal));
+                modal.addEventListener('click', (e) => { if (e.target === modal) document.body.removeChild(modal); });
+            }
+            
+            function showSVIPPanel() {
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                if (!isVip) { alert('此功能仅限SVIP使用'); return; }
+                const studentsInClass = userData.students.filter(s => s.classId === currentClassId);
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `<div class="modal-content" style="max-width: 700px;"><h2><i class="fa-regular fa-gem"></i> SVIP专属功能面板</h2><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0;"><div class="feature-card" style="background: var(--bg-card);"><h4>⏳ 倒计时</h4><div class="timer-display" id="panel-countdown-display">05:00</div><div class="timer-controls"><button class="timer-btn" id="panel-countdown-start">开始</button><button class="timer-btn secondary" id="panel-countdown-pause">暂停</button><button class="timer-btn secondary" id="panel-countdown-reset">重置</button></div><div><input type="number" id="panel-countdown-set" value="5" min="1" max="60" style="width:70px; background:var(--bg-input); border-radius:60px; padding:0.3rem;"> 分钟</div></div><div class="feature-card" style="background: var(--bg-card);"><h4>⏱️ 秒表</h4><div class="timer-display" id="panel-stopwatch-display">00:00.0</div><div class="stopwatch-controls"><button class="timer-btn" id="panel-stopwatch-start">开始</button><button class="timer-btn secondary" id="panel-stopwatch-pause">暂停</button><button class="timer-btn secondary" id="panel-stopwatch-reset">重置</button></div></div><div class="feature-card" style="grid-column: span 2; background: var(--bg-card);"><h4>🎲 随机点名</h4><div style="font-size: 2rem; margin: 1rem 0; min-height: 4rem; color: var(--accent);" id="random-student-result">——</div><button class="timer-btn" id="random-student-btn" style="font-size: 1.2rem; padding: 0.8rem 2rem;">点我随机点名（按权重）</button><p style="color: var(--text-secondary); margin-top: 0.5rem;">当前班级学生数: ${studentsInClass.length}</p></div></div><button class="modal-close" id="panel-close">关闭</button></div>`;
+                document.body.appendChild(modal);
+                let panelCountdownTime = 300, panelCountdownInterval = null, panelCountdownRunning = false;
+                let panelStopwatchTime = 0, panelStopwatchInterval = null, panelStopwatchRunning = false;
+                const countdownDisplay = document.getElementById('panel-countdown-display');
+                const stopwatchDisplay = document.getElementById('panel-stopwatch-display');
+                const countdownInput = document.getElementById('panel-countdown-set');
+                const updatePanelCountdown = () => { const mins = Math.floor(panelCountdownTime / 60), secs = panelCountdownTime % 60; countdownDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`; };
+                updatePanelCountdown();
+                const updatePanelStopwatch = () => { const totalSeconds = Math.floor(panelStopwatchTime), minutes = Math.floor(totalSeconds / 60), seconds = totalSeconds % 60, tenths = Math.floor((panelStopwatchTime - totalSeconds) * 10); stopwatchDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}.${tenths}`; };
+                updatePanelStopwatch();
+                document.getElementById('panel-countdown-start').onclick = () => { if (panelCountdownRunning) return; panelCountdownRunning = true; panelCountdownInterval = setInterval(() => { if (panelCountdownTime > 0) { panelCountdownTime--; updatePanelCountdown(); } else { clearInterval(panelCountdownInterval); panelCountdownRunning = false; alert('倒计时结束！'); } }, 1000); };
+                document.getElementById('panel-countdown-pause').onclick = () => { clearInterval(panelCountdownInterval); panelCountdownRunning = false; };
+                document.getElementById('panel-countdown-reset').onclick = () => { clearInterval(panelCountdownInterval); panelCountdownRunning = false; const mins = parseInt(countdownInput.value) || 5; panelCountdownTime = mins * 60; updatePanelCountdown(); };
+                document.getElementById('panel-stopwatch-start').onclick = () => { if (panelStopwatchRunning) return; panelStopwatchRunning = true; const startTime = Date.now() - panelStopwatchTime * 1000; panelStopwatchInterval = setInterval(() => { panelStopwatchTime = (Date.now() - startTime) / 1000; updatePanelStopwatch(); }, 100); };
+                document.getElementById('panel-stopwatch-pause').onclick = () => { clearInterval(panelStopwatchInterval); panelStopwatchRunning = false; };
+                document.getElementById('panel-stopwatch-reset').onclick = () => { clearInterval(panelStopwatchInterval); panelStopwatchRunning = false; panelStopwatchTime = 0; updatePanelStopwatch(); };
+                // 使用权重随机点名
+                document.getElementById('random-student-btn').onclick = () => {
+                    const selected = getWeightedRandomStudent(currentClassId);
+                    if (!selected) {
+                        document.getElementById('random-student-result').innerHTML = '<span style="color: var(--danger);">点名失败（无学生或总权重为0）</span>';
+                        return;
+                    }
+                    const group = userData.groups.find(g => g.id === selected.groupId);
+                    const groupStr = group ? ` (${group.name})` : '';
+                    document.getElementById('random-student-result').innerHTML = `<span style="color: var(--accent);">🎉 ${selected.name}${groupStr}</span>`;
+                };
+                document.getElementById('panel-close').onclick = () => { clearInterval(panelCountdownInterval); clearInterval(panelStopwatchInterval); document.body.removeChild(modal); };
+                modal.addEventListener('click', (e) => { if (e.target === modal) { clearInterval(panelCountdownInterval); clearInterval(panelStopwatchInterval); document.body.removeChild(modal); } });
+            }
+
+            function renderClassList() {
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                let classCards = '';
+                userData.classes.forEach((cls, idx) => {
+                    const studentsInClass = userData.students.filter(s => s.classId === cls.id);
+                    const totalPoints = studentsInClass.reduce((acc, s) => acc + s.points, 0);
+                    classCards += `<div class="class-card" data-class-id="${cls.id}" style="--order: ${idx};"><div class="class-header"><span class="class-title"><i class="fa-regular fa-rectangle-ad"></i> ${cls.name}${cls.groupMode ? ' (小组模式)' : ''}</span><button class="delete-class-btn" data-action="delete-class" data-class-id="${cls.id}"><i class="fa-solid fa-trash"></i></button></div><div class="class-stats"><span><i class="fa-regular fa-user"></i> ${studentsInClass.length} 人</span><span><i class="fa-regular fa-star"></i> 总分 ${totalPoints}</span></div><div style="margin-top:8px; color:var(--accent);"><i class="fa-regular fa-hand-pointer"></i> 点击卡片进入班级</div></div>`;
+                });
+                if (!userData.classes.length) classCards = `<div style="grid-column:1/-1; background:var(--bg-card); border-radius:2rem; padding:3rem; text-align:center;">还没有班级，点击上方添加班级吧</div>`;
+                const html = `<div class="app-header"><div class="logo"><h1>少年沃积分管理 <span class="version">${VERSION_STRING}</span></h1></div><div class="user-area"><div class="user-greeting" id="profile-btn"><i class="fa-regular fa-circle-user"></i> ${currentUser} ${isVip ? '<span class="svip-badge-user"><i class="fa-regular fa-gem"></i> SVIP</span>' : ''}</div><button class="btn-icon" id="settings-btn"><i class="fa-solid fa-gear"></i> 设置</button><button class="btn-icon" id="more-features-btn"><i class="fa-solid fa-ellipsis-h"></i> 更多</button><button class="btn-icon" id="switch-account-list"><i class="fa-solid fa-arrow-right-arrow-left"></i> 切换</button><button class="btn-icon" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> 注销</button></div></div><div class="main-container"><div class="toolbar"><div class="tool-section"><i class="fa-regular fa-hard-drive"></i><label>数据</label><button class="tool-btn" id="export-data-btn"><i class="fa-regular fa-file-export"></i> 导出</button><button class="tool-btn" id="import-data-btn"><i class="fa-regular fa-file-import"></i> 导入</button><input type="file" id="import-file" accept="application/json"></div><div class="tool-section"><i class="fa-regular fa-square-plus"></i><label>新班级</label><input type="text" id="new-class-name" placeholder="班级名称" style="background:var(--bg-input);border-radius:40px;padding:0.5rem 1rem;"><div style="display:flex;gap:0.5rem;"><input type="checkbox" id="new-class-groupmode"><label>启用小组</label></div><button class="tool-btn" id="add-class-btn"><i class="fa-solid fa-plus"></i> 添加</button></div><div class="tool-section"><i class="fa-solid fa-trophy" style="color:gold;"></i><button class="tool-btn" id="rankings-btn"><i class="fa-solid fa-ranking-star"></i> 班级排行</button></div></div><div class="class-grid" id="class-grid">${classCards}</div><div style="text-align:center; margin-top:2rem; padding:0.5rem; background:rgba(255,255,0,0.1); border-radius:60px; color:#ffaa00;"><i class="fa-regular fa-copyright"></i> 版权由少年沃所有，请勿抄袭！！！</div><div class="footer-note"><i class="fa-regular fa-compass"></i> 点击班级卡片进入管理</div></div>`;
+                appDiv.innerHTML = html;
+                attachVersionClickEvent();
+                document.getElementById('profile-btn').addEventListener('click', showProfile);
+                document.getElementById('settings-btn').addEventListener('click', showGlobalSettings);
+                document.getElementById('more-features-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showMoreMenu(e.currentTarget);
+                });
+                document.getElementById('export-data-btn').addEventListener('click', exportData);
+                document.getElementById('import-data-btn').addEventListener('click', () => document.getElementById('import-file').click());
+                document.getElementById('import-file').addEventListener('change', (e) => { if (e.target.files.length) importDataFromFile(e.target.files[0]); });
+                document.getElementById('logout-btn').addEventListener('click', () => { if (confirm('退出登录')) { currentUser = null; localStorage.removeItem(STORAGE_KEEP_LOGIN); renderApp(); } });
+                document.getElementById('switch-account-list').addEventListener('click', showSwitchAccountModal);
+                document.getElementById('add-class-btn').addEventListener('click', () => {
+                    const name = document.getElementById('new-class-name').value.trim();
+                    if (!name) return alert('请输入班级名称');
+                    pushHistory();
+                    const groupMode = document.getElementById('new-class-groupmode').checked;
+                    userData.classes.push({ id: genId(), name, groupMode });
+                    saveUserData(currentUser, userData);
+                    renderClassList();
+                });
+                document.getElementById('rankings-btn').addEventListener('click', showClassRankings);
+                document.querySelectorAll('.class-card').forEach(card => { card.addEventListener('click', (e) => { if (e.target.closest('.delete-class-btn')) return; currentClassId = card.dataset.classId; viewMode = 'detail'; classDetailTab = 'students'; renderMain(); }); });
+                document.querySelectorAll('[data-action="delete-class"]').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const id = btn.dataset.classId; if (confirm('删除班级？')) { pushHistory(); userData.classes = userData.classes.filter(c => c.id !== id); userData.students = userData.students.filter(s => s.classId !== id); userData.groups = userData.groups.filter(g => g.classId !== id); saveUserData(currentUser, userData); renderClassList(); } }); });
+                updateWatermark();
+            }
+
+            function renderClassDetail() {
+                const cls = userData.classes.find(c => c.id === currentClassId);
+                if (!cls) { viewMode = 'list'; renderClassList(); return; }
+                const isVip = (userData.profile?.vipExpire || 0) > Date.now();
+                const studentsInClass = userData.students.filter(s => s.classId === currentClassId);
+                const groupsInClass = userData.groups.filter(g => g.classId === currentClassId);
+                let contentHtml = '';
+                if (classDetailTab === 'students') {
+                    let studentCards = '';
+                    studentsInClass.forEach((stu, idx) => {
+                        let pointsClass = 'student-points';
+                        if (stu.points < 0) pointsClass += ' negative';
+                        else if (stu.points > 0) pointsClass += ' positive';
+                        const group = groupsInClass.find(g => g.id === stu.groupId);
+                        const groupLabel = group ? ` (${group.name})` : '';
+                        studentCards += `<div class="student-card" data-student-id="${stu.id}" style="--order: ${idx};"><div class="student-name"><i class="fa-regular fa-circle-user"></i><span>${stu.name}${groupLabel}</span></div><div class="${pointsClass}" data-points-value="${stu.points}">${stu.points}</div><div class="student-actions-card"><button class="student-card-btn" data-action="student-inc" data-student-id="${stu.id}"><i class="fa-solid fa-plus"></i></button><button class="student-card-btn" data-action="student-dec" data-student-id="${stu.id}"><i class="fa-solid fa-minus"></i></button><button class="student-card-btn del" data-action="student-delete" data-student-id="${stu.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+                    });
+                    const groupSelect = cls.groupMode ? `<select id="new-student-group"><option value="">无小组</option>${groupsInClass.map(g => `<option value="${g.id}">${g.name}</option>`).join('')}</select>` : '';
+                    contentHtml = `<div class="add-student-section"><input type="text" id="new-student-name" placeholder="新学生姓名">${groupSelect}<button id="add-student-btn"><i class="fa-solid fa-user-plus"></i> 添加学生</button></div><div class="student-grid" id="student-grid">${studentCards || '<div class="empty-grid">暂无学生</div>'}</div>`;
+                } else {
+                    let groupCards = '';
+                    const groupsWithPoints = groupsInClass.map(g => { const members = studentsInClass.filter(s => s.groupId === g.id); const total = members.reduce((a,b) => a + b.points, 0); return { ...g, totalPoints: total, members }; }).sort((a,b) => b.totalPoints - a.totalPoints);
+                    groupsWithPoints.forEach((g, idx) => {
+                        groupCards += `<div class="class-card" style="--order: ${idx};"><div class="class-header"><span class="class-title"><span class="rank-badge">${idx+1}</span><i class="fa-regular fa-people-group"></i> ${g.name}</span><button class="delete-class-btn" data-action="delete-group" data-group-id="${g.id}"><i class="fa-solid fa-trash"></i></button></div><div class="class-stats"><span>${g.members.length}人</span><span>总分 ${g.totalPoints}</span></div><div>${g.members.map(m => m.name).join('、') || '无成员'}</div></div>`;
+                    });
+                    contentHtml = `<div class="group-manager"><input type="text" id="new-group-name" placeholder="新小组名称"><button id="add-group-btn"><i class="fa-solid fa-plus"></i> 创建小组</button></div><div class="class-grid">${groupCards || '<div class="empty-grid">暂无小组</div>'}</div>`;
+                }
+                const html = `<div class="app-header"><div class="logo"><h1>少年沃积分管理 · 班级详情 <span class="version">${VERSION_STRING}</span></h1></div><div class="user-area"><div class="user-greeting" id="profile-btn"><i class="fa-regular fa-circle-user"></i> ${currentUser} ${isVip ? '<span class="svip-badge-user"><i class="fa-regular fa-gem"></i> SVIP</span>' : ''}</div><button class="btn-icon" id="settings-btn"><i class="fa-solid fa-gear"></i> 设置</button><button class="btn-icon" id="more-features-detail-btn"><i class="fa-solid fa-ellipsis-h"></i> 更多</button><button class="btn-icon" id="switch-account-detail"><i class="fa-solid fa-arrow-right-arrow-left"></i> 切换</button><button class="btn-icon" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> 注销</button></div></div><div class="detail-container"><div class="detail-header"><button class="back-btn" id="back-to-list"><i class="fa-solid fa-arrow-left"></i> 返回班级列表</button><div class="class-info"><i class="fa-regular fa-rectangle-ad"></i> ${cls.name}</div><div><button class="btn-icon" id="student-rankings-btn"><i class="fa-solid fa-ranking-star"></i> 学生排行</button><button class="btn-icon" id="svip-panel-btn" style="color:gold;"><i class="fa-regular fa-gem"></i> SVIP功能</button><button class="delete-class-detail" id="delete-class-detail"><i class="fa-solid fa-trash"></i> 删除班级</button></div></div>${cls.groupMode ? `<div class="class-tabs"><button class="class-tab ${classDetailTab === 'students' ? 'active' : ''}" id="tab-students">个人积分</button><button class="class-tab ${classDetailTab === 'groups' ? 'active' : ''}" id="tab-groups">小组排行</button></div>` : ''}<div class="batch-bar"><button class="batch-btn" id="class-inc"><i class="fa-solid fa-circle-plus"></i>全班+1</button><button class="batch-btn" id="class-dec"><i class="fa-solid fa-circle-minus"></i>全班-1</button><button class="batch-btn" id="class-reset"><i class="fa-regular fa-rotate-left"></i>全班清零</button></div>${contentHtml}</div>`;
+                appDiv.innerHTML = html;
+                attachVersionClickEvent();
+                document.getElementById('profile-btn').addEventListener('click', showProfile);
+                document.getElementById('settings-btn').addEventListener('click', showGlobalSettings);
+                document.getElementById('more-features-detail-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showMoreMenu(e.currentTarget);
+                });
+                document.getElementById('logout-btn').addEventListener('click', () => { if (confirm('退出登录')) { currentUser = null; localStorage.removeItem(STORAGE_KEEP_LOGIN); renderApp(); } });
+                document.getElementById('switch-account-detail').addEventListener('click', showSwitchAccountModal);
+                document.getElementById('back-to-list').addEventListener('click', () => { viewMode = 'list'; currentClassId = null; renderMain(); });
+                document.getElementById('student-rankings-btn').addEventListener('click', showStudentRankingsInClass);
+                document.getElementById('svip-panel-btn').addEventListener('click', showSVIPPanel);
+                document.getElementById('delete-class-detail').addEventListener('click', () => { if (confirm('删除班级？')) { pushHistory(); userData.classes = userData.classes.filter(c => c.id !== currentClassId); userData.students = userData.students.filter(s => s.classId !== currentClassId); userData.groups = userData.groups.filter(g => g.classId !== currentClassId); saveUserData(currentUser, userData); viewMode = 'list'; currentClassId = null; renderMain(); } });
+                
+                const classIncBtn = document.getElementById('class-inc');
+                const classDecBtn = document.getElementById('class-dec');
+                const classResetBtn = document.getElementById('class-reset');
+                if (classIncBtn) {
+                    classIncBtn.addEventListener('click', () => {
+                        pushHistory();
+                        userData.students.forEach(s => { if (s.classId === currentClassId) s.points++; });
+                        saveUserData(currentUser, userData);
+                        document.querySelectorAll('.student-card').forEach(card => {
+                            const sid = card.dataset.studentId;
+                            const stu = userData.students.find(s => s.id === sid);
+                            if (stu) {
+                                const pointsDiv = card.querySelector('.student-points');
+                                if (pointsDiv) {
+                                    pointsDiv.textContent = stu.points;
+                                    pointsDiv.classList.remove('positive', 'negative');
+                                    if (stu.points > 0) pointsDiv.classList.add('positive');
+                                    else if (stu.points < 0) pointsDiv.classList.add('negative');
+                                }
+                            }
+                        });
+                    });
+                }
+                if (classDecBtn) {
+                    classDecBtn.addEventListener('click', () => {
+                        pushHistory();
+                        userData.students.forEach(s => { if (s.classId === currentClassId) s.points--; });
+                        saveUserData(currentUser, userData);
+                        document.querySelectorAll('.student-card').forEach(card => {
+                            const sid = card.dataset.studentId;
+                            const stu = userData.students.find(s => s.id === sid);
+                            if (stu) {
+                                const pointsDiv = card.querySelector('.student-points');
+                                if (pointsDiv) {
+                                    pointsDiv.textContent = stu.points;
+                                    pointsDiv.classList.remove('positive', 'negative');
+                                    if (stu.points > 0) pointsDiv.classList.add('positive');
+                                    else if (stu.points < 0) pointsDiv.classList.add('negative');
+                                }
+                            }
+                        });
+                    });
+                }
+                if (classResetBtn) {
+                    classResetBtn.addEventListener('click', () => {
+                        if (confirm('全班清零？')) {
+                            pushHistory();
+                            userData.students.forEach(s => { if (s.classId === currentClassId) s.points = 0; });
+                            saveUserData(currentUser, userData);
+                            document.querySelectorAll('.student-card').forEach(card => {
+                                const sid = card.dataset.studentId;
+                                const stu = userData.students.find(s => s.id === sid);
+                                if (stu) {
+                                    const pointsDiv = card.querySelector('.student-points');
+                                    if (pointsDiv) {
+                                        pointsDiv.textContent = '0';
+                                        pointsDiv.classList.remove('positive', 'negative');
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                
+                if (cls.groupMode) {
+                    document.getElementById('tab-students').addEventListener('click', () => { classDetailTab = 'students'; renderClassDetail(); });
+                    document.getElementById('tab-groups').addEventListener('click', () => { classDetailTab = 'groups'; renderClassDetail(); });
+                }
+                if (classDetailTab === 'students') {
+                    document.getElementById('add-student-btn').addEventListener('click', () => {
+                        const name = document.getElementById('new-student-name').value.trim();
+                        if (!name) return alert('请输入姓名');
+                        pushHistory();
+                        let groupId = null;
+                        if (cls.groupMode) { const sel = document.getElementById('new-student-group'); if (sel) groupId = sel.value || null; }
+                        userData.students.push({ id: genId(), name, points: 0, classId: currentClassId, groupId });
+                        saveUserData(currentUser, userData);
+                        renderClassDetail();
+                    });
+                    
+                    const studentGrid = document.getElementById('student-grid');
+                    if (studentGrid) {
+                        studentGrid.addEventListener('click', (e) => {
+                            const btn = e.target.closest('button');
+                            if (!btn) return;
+                            const action = btn.dataset.action;
+                            const sid = btn.dataset.studentId;
+                            const stu = userData.students.find(s => s.id === sid);
+                            if (!stu) return;
+                            
+                            if (action === 'student-inc') {
+                                pushHistory();
+                                stu.points++;
+                                saveUserData(currentUser, userData);
+                                const card = btn.closest('.student-card');
+                                if (card) {
+                                    const pointsDiv = card.querySelector('.student-points');
+                                    if (pointsDiv) {
+                                        pointsDiv.textContent = stu.points;
+                                        pointsDiv.classList.remove('positive', 'negative');
+                                        if (stu.points > 0) pointsDiv.classList.add('positive');
+                                        else if (stu.points < 0) pointsDiv.classList.add('negative');
+                                    }
+                                }
+                            } else if (action === 'student-dec') {
+                                pushHistory();
+                                stu.points--;
+                                saveUserData(currentUser, userData);
+                                const card = btn.closest('.student-card');
+                                if (card) {
+                                    const pointsDiv = card.querySelector('.student-points');
+                                    if (pointsDiv) {
+                                        pointsDiv.textContent = stu.points;
+                                        pointsDiv.classList.remove('positive', 'negative');
+                                        if (stu.points > 0) pointsDiv.classList.add('positive');
+                                        else if (stu.points < 0) pointsDiv.classList.add('negative');
+                                    }
+                                }
+                            } else if (action === 'student-delete') {
+                                if (confirm('删除学生？')) {
+                                    pushHistory();
+                                    userData.students = userData.students.filter(s => s.id !== sid);
+                                    saveUserData(currentUser, userData);
+                                    renderClassDetail();
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    document.getElementById('add-group-btn').addEventListener('click', () => {
+                        const name = document.getElementById('new-group-name').value.trim();
+                        if (!name) return alert('小组名');
+                        pushHistory();
+                        userData.groups.push({ id: genId(), name, classId: currentClassId });
+                        saveUserData(currentUser, userData);
+                        renderClassDetail();
+                    });
+                    document.querySelectorAll('[data-action="delete-group"]').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const gid = btn.dataset.groupId; if (confirm('删除小组？成员变为无小组')) { pushHistory(); userData.students.forEach(s => { if (s.groupId === gid) s.groupId = null; }); userData.groups = userData.groups.filter(g => g.id !== gid); saveUserData(currentUser, userData); renderClassDetail(); } }); });
+                }
+                updateWatermark();
+            }
+
+            function renderMain() { if (viewMode === 'profile') renderProfile(); else if (viewMode === 'list') renderClassList(); else renderClassDetail(); }
+            function renderApp() { 
+                clearAllTimers(); 
+                if (currentUser) { 
+                    userData = getUserData(currentUser); 
+                    if (viewMode === 'detail' && currentClassId && !userData.classes.some(c => c.id === currentClassId)) { 
+                        viewMode = 'list'; 
+                        currentClassId = null; 
+                    } else if (viewMode !== 'profile') viewMode = 'list'; 
+                    applyTheme(); 
+                    renderMain(); 
+                } else renderAuth(); 
+                updateWatermark(); 
+                if (currentUser) {
+                    addUndoButton();
+                    if (isSystemActivated()) {
+                        createAppDrawer();
+                    } else {
+                        removeAppDrawer();
+                    }
+                } else {
+                    const existing = document.getElementById('global-undo-fab');
+                    if (existing) existing.remove();
+                    removeAppDrawer();
+                }
+            }
+
+            function addUndoButton() {
+                if (document.getElementById('global-undo-fab')) return;
+                const btn = document.createElement('button');
+                btn.id = 'global-undo-fab';
+                btn.className = 'undo-fab';
+                btn.innerHTML = '<i class="fa-solid fa-undo"></i>';
+                btn.title = '撤销上一步操作';
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    undo();
+                });
+                document.body.appendChild(btn);
+            }
+
+            startHeartbeatDetection();
+            const autoLoginSuccess = tryAutoLogin();
+            renderApp();
+
+            const loader = document.getElementById('startupLoader');
+            if (loader) {
+                const subSpan = loader.querySelector('.sub');
+                if (subSpan) subSpan.textContent = 'NEXT-2.1';
+                setTimeout(() => {
+                    loader.classList.add('hide');
+                    setTimeout(() => {
+                        if (loader && loader.parentNode) loader.parentNode.removeChild(loader);
+                    }, 600);
+                }, 4500);
+            }
+        })();
+    </script>
+</body>
+</html>
